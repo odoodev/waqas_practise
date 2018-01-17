@@ -1,0 +1,72 @@
+<odoo>
+    <data>
+
+
+        <!--<delete model="crm.stage" id="stage_lead1" />-->
+        <!--<delete model='optecha.optecha' id="stage_lead3" />-->
+
+        <record model="crm.stage" id="stage_lead9">
+            <field name="name">Make Design</field>
+            <field name="probability">10</field>
+            <field name="on_change">1</field>
+            <field name="sequence">71</field>
+        </record>
+
+
+        <record model="crm.stage" id="stage_lead10">
+            <field name="name">Customer Review</field>
+            <field name="probability">20</field>
+            <field name="on_change">1</field>
+            <field name="sequence">72</field>
+        </record>
+
+
+        <record model="crm.stage" id="stage_lead11">
+            <field name="name">Quotation Review</field>
+            <field name="probability">30</field>
+            <field name="on_change">1</field>
+            <field name="sequence">73</field>
+        </record>
+
+        <record model="crm.stage" id="stage_lead12">
+            <field name="name">Drawing Approved</field>
+            <field name="probability">40</field>
+            <field name="on_change">1</field>
+            <field name="sequence">74</field>
+        </record>
+
+        <record model="crm.stage" id="stage_lead13">
+            <field name="name">Sales Order</field>
+            <field name="probability">50</field>
+            <field name="on_change">1</field>
+            <field name="sequence">75</field>
+        </record>
+
+        <!--  -->
+        <!--   <record id="object0" model="optecha.optecha"> -->
+        <!--     <field name="name">Object 0</field> -->
+        <!--     <field name="value">0</field> -->
+        <!--   </record> -->
+        <!--  -->
+        <!--   <record id="object1" model="optecha.optecha"> -->
+        <!--     <field name="name">Object 1</field> -->
+        <!--     <field name="value">10</field> -->
+        <!--   </record> -->
+        <!--  -->
+        <!--   <record id="object2" model="optecha.optecha"> -->
+        <!--     <field name="name">Object 2</field> -->
+        <!--     <field name="value">20</field> -->
+        <!--   </record> -->
+        <!--  -->
+        <!--   <record id="object3" model="optecha.optecha"> -->
+        <!--     <field name="name">Object 3</field> -->
+        <!--     <field name="value">30</field> -->
+        <!--   </record> -->
+        <!--  -->
+        <!--   <record id="object4" model="optecha.optecha"> -->
+        <!--     <field name="name">Object 4</field> -->
+        <!--     <field name="value">40</field> -->
+        <!--   </record> -->
+        <!--  -->
+    </data>
+</odoo>
