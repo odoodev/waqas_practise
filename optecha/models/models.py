@@ -224,10 +224,12 @@ class CrmLead(models.Model):
         """
         if self.stage_id.name.lower() == "Make Design".lower():
             template = self.env["mail.template"].search([("name", "=", "Make Design")])
-            lead_designer_id = self.env['res.groups'].search([('name', '=', 'Lead Designer')]).id
+            local_context = self.env.context.copy()
+            local_context.update({"opportunity_name": self.name})
+            lead_designer_id = self.env['res.groups'].search([('name','=', 'Lead Designer')]).id
             users = self.env["res.users"].search([("groups_id", "=", lead_designer_id)])
             for user in users:
-                template.send_mail(user.id, email_values={"body_html": MAKE_DESIGN_HTML.format(user.name, self.name)})
+                template.with_context(local_context).send_mail(user.id)
 
 
 class OptechaProducts(models.Model):
