@@ -42,11 +42,20 @@ class OptechaDesign(models.Model):
         ('done', 'Done')
         ], default='in_progress')
 
-    # < p >${object.designer_id} < / p >
-    # < p > Please
-    # review
-    # the ${object.name} ${object.opportunity_id}
-    # design. < / p >
+    @api.model
+    def create(self, values):
+        """
+
+        :param values:
+        :return:
+        """
+        record = super(OptechaDesign, self).create(values)
+        template = self.env["mail.template"].search([("name", "=", "Prepare Design")])
+        local_context = self.env.context.copy()
+        local_context.update({"design_name": values["name"]})
+        template.with_context(local_context).send_mail(values["designer_id"], force_send=True)
+        return record
+
     @api.multi
     def team_review(self):
         template = self.env["mail.template"].search([("name", "=", "Team Review")])
@@ -222,7 +231,7 @@ class CrmLead(models.Model):
 
         :return:
         """
-        if self.stage_id.name.lower() == "Make Design".lower():
+        if self.stage_id.name.lower() == "Design".lower():
             template = self.env["mail.template"].search([("name", "=", "Make Design")])
             local_context = self.env.context.copy()
             local_context.update({"opportunity_name": self.name})

@@ -6,7 +6,7 @@
         <!--<delete model='optecha.optecha' id="stage_lead3" />-->
 
         <record model="crm.stage" id="stage_lead9">
-            <field name="name">Make Design</field>
+            <field name="name">Opportunity</field>
             <field name="probability">10</field>
             <field name="on_change">1</field>
             <field name="sequence">71</field>
@@ -14,7 +14,7 @@
 
 
         <record model="crm.stage" id="stage_lead10">
-            <field name="name">Customer Review</field>
+            <field name="name">Design</field>
             <field name="probability">20</field>
             <field name="on_change">1</field>
             <field name="sequence">72</field>
@@ -22,21 +22,21 @@
 
 
         <record model="crm.stage" id="stage_lead11">
-            <field name="name">Quotation Review</field>
+            <field name="name">Quote</field>
             <field name="probability">30</field>
             <field name="on_change">1</field>
             <field name="sequence">73</field>
         </record>
 
         <record model="crm.stage" id="stage_lead12">
-            <field name="name">Drawing Approved</field>
+            <field name="name">Won</field>
             <field name="probability">40</field>
             <field name="on_change">1</field>
             <field name="sequence">74</field>
         </record>
 
         <record model="crm.stage" id="stage_lead13">
-            <field name="name">Sales Order</field>
+            <field name="name">Approval Drawing</field>
             <field name="probability">50</field>
             <field name="on_change">1</field>
             <field name="sequence">75</field>

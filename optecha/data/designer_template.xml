@@ -2,24 +2,6 @@
 <odoo>
     <data >
 
-        <record id="send_designer_email" model="mail.template">
-            <field name="name">Hi</field>
-            <field name="email_from">
-                ${(object.user_id.email and '%s &lt;%s&gt;' %      (object.user_id.name, object.user_id.email) or '')|safe}
-            </field>
-            <field name="subject">${object.name}</field>
-            <!--<field name="email_to">${(object.designer_id.email)}</field>-->
-            <field name="model_id" ref="optecha.model_optecha_design"/>
-            <field name="auto_delete" eval="True"/>
-            <field name="lang">${object.lang}</field>
-            <field name="body_html"><![CDATA[
-            <p>Dear waqas,<br/><br/>
-	      Good job, you've just created your first e-mail template!<br/></p>
-
-
-            ]]>
-            </field>
-        </record>
 
     </data>
 </odoo>
