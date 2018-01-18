@@ -1,22 +1,49 @@
 <odoo>
     <data>
-        <!-- <template id="listing"> -->
-        <!--   <ul> -->
-        <!--     <li t-foreach="objects" t-as="object"> -->
-        <!--       <a t-attf-href="#{ root }/objects/#{ object.id }"> -->
-        <!--         <t t-esc="object.display_name"/> -->
-        <!--       </a> -->
-        <!--     </li> -->
-        <!--   </ul> -->
-        <!-- </template> -->
-        <!-- <template id="object"> -->
-        <!--   <h1><t t-esc="object.display_name"/></h1> -->
-        <!--   <dl> -->
-        <!--     <t t-foreach="object._fields" t-as="field"> -->
-        <!--       <dt><t t-esc="field"/></dt> -->
-        <!--       <dd><t t-esc="object[field]"/></dd> -->
-        <!--     </t> -->
-        <!--   </dl> -->
-        <!-- </template> -->
+
+
+        <record id="example_email_template" model="mail.template">
+            <field name="name">Customer Review</field>
+            <field name="email_from">${(object.email and object.name or '')}</field>
+            <field name="subject">Customer Review</field>
+            <field name="email_to">${object.opportunity_id.partner_id.email|safe}</field>
+            <field name="model_id" ref="optecha.model_optecha_design"/>
+            <field name="lang">${object.lang}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html">
+            <![CDATA[
+            <p> <img src="data:image/png;base64,${user.company_id.logo}" style="width: 80px;margin:0;padding:0;height:auto;" /> </p>
+	      <p>Dear ${ctx.get("customer_name")},<br/><br/>
+	      Please prepare a quote for the  revision version: ${ctx.get("revision_no")} and opportunity name: ${ctx.get("opportunity_name")} design.
+             <br/> Best Regards,<br/>
+             ${user.signature | safe}
+             Sent by ${user.company_id.name} using
+	    ]]>
+	  </field>
+       </record>
+        <record id="optecha.model_optecha_design" model="ir.model">
+            <field name="website_form_access">True</field>
+            <field name="website_form_label">Customer</field>
+        </record>
+        <function model="ir.model.fields" name="formbuilder_whitelist">
+            <value>optecha.design</value>
+            <value eval="[
+                'name','designer_id','design_file'
+            ]"/>
+        </function>
+
+
+        <!--<record id="base.model_res_partnersss" model="ir.model">
+            <field name="website_form_access">True</field>
+            <field name="website_form_label">Customer</field>
+        </record>
+        <function model="ir.model.fields" name="formbuilder_whitelist">
+            <value>res.partner</value>
+            <value eval="[
+                'name', 'phone', 'email',
+                'city', 'zip', 'street', 'street2', 'state_id', 'country_id',
+                'vat', 'company_name'
+            ]"/>
+        </function>-->
     </data>
 </odoo>

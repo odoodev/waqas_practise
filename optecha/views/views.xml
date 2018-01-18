@@ -108,6 +108,10 @@
 
                         <button string="Reset" type="object"
                                 name="reset" attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                        <button name="action_quotation_send" string="Send by Email" type="object"
+                                attrs="{'invisible': [('state','!=','customer_review')]}" class="btn-primary"
+                         context="{'design_file': True}"/>
+
                              <!--This will create the statusbar, thanks to the widget. -->
                         <field name="state" widget="statusbar"/>
                     </header>
