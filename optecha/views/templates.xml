@@ -25,12 +25,10 @@
             <field name="website_form_access">True</field>
             <field name="website_form_label">Customer</field>
         </record>
-        <function model="ir.model.fields" name="formbuilder_whitelist">
-            <value>optecha.design</value>
-            <value eval="[
-                'name','designer_id','design_file'
-            ]"/>
-        </function>
+        <!--<function model="ir.model.fields" name="formbuilder_whitelist">-->
+            <!--<value>optecha.design</value>-->
+            <!--<value eval="['name','designer_id']"/>-->
+        <!--</function>-->
 
 
         <!--<record id="base.model_res_partnersss" model="ir.model">

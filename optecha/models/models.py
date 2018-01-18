@@ -72,14 +72,14 @@ class OptechaDesign(models.Model):
 
     @api.multi
     def customer_review(self):
-        if self.opportunity_id.id:
-            template = self.env["mail.template"].search([("name", "=", "Customer Review")])
-            template.attachment_ids = None
-            template.attachment_ids = [attachment.id for attachment in self.design_file]
-            local_context = self.env.context.copy()
-            local_context.update({"revision_no": self.revision_version,
-                                  "opportunity_name": self.opportunity_id.name})
-            template.with_context(local_context).send_mail(self.opportunity_id.partner_id.id, force_send=True)
+        # if self.opportunity_id.id:
+        #     template = self.env["mail.template"].search([("name", "=", "Customer Review")])
+        #     template.attachment_ids = None
+        #     template.attachment_ids = [attachment.id for attachment in self.design_file]
+        #     local_context = self.env.context.copy()
+        #     local_context.update({"revision_no": self.revision_version,
+        #                           "opportunity_name": self.opportunity_id.name})
+        #     template.with_context(local_context).send_mail(self.opportunity_id.partner_id.id, force_send=True)
         self.write({
             'state': 'customer_review',
         })
