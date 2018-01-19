@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from .constants import MAKE_DESIGN_HTML
 
 
 class OptechaDesign(models.Model):
@@ -27,7 +26,6 @@ class OptechaDesign(models.Model):
                                    help="Desiger, odoo user", required=False)
     design_file = fields.Many2many('ir.attachment', 'optechadesign_ir_attachments_rel',
                                    'optechadesign_id', 'attachment_id', 'Attachments')
-
 
 
     """
@@ -83,7 +81,7 @@ class OptechaDesign(models.Model):
         self.write({
             'state': 'customer_review',
         })
-
+ 
     @api.multi
     def done(self):
         template = self.env["mail.template"].search([("name", "=", "Design Approved By Customer")])
@@ -147,8 +145,6 @@ class OptechaDesign(models.Model):
         template.attachment_ids = None
         template.attachment_ids = [attachment.id for attachment in self.design_file]
 
-
-
         ctx = {
             'default_model': 'optecha.design',
             'default_res_id': self.ids[0],
@@ -189,11 +185,10 @@ class OptechaDrawing(models.Model):
     revision_version = fields.Char('Revision Version')
     version = fields.Char('Drawing Version')
     state = fields.Selection([
-        ('in_progress', 'Prepare Design'),
-        ('approved', 'Approve Design'),
-        ('issued_to_customer', 'Issued To Customer'),
-        ('engineer_review', 'Engineer Drawing Review'),
-        ('done', 'Approved')
+        ('in_progress', 'Prepare Approval Drawing Package'),
+        ('team_review', 'Optecha Review Approval Drawing Package'),
+        ('engineer_review', 'Contractor/Engineer Review Approval Drawing Package'),
+        ('done', 'Done')
     ], default='in_progress')
 
     @api.onchange("quotation_id")
@@ -208,9 +203,9 @@ class OptechaDrawing(models.Model):
         })
 
     @api.multi
-    def approved(self):
+    def team_review(self):
         self.write({
-            'state': 'approved',
+            'state': 'team_review',
         })
 
     @api.multi
@@ -226,30 +221,30 @@ class OptechaDrawing(models.Model):
     @api.multi
     def done(self):
         # approved
-        template = self.env["mail.template"].search([("name", "=", "Drawing Approved By Drawing Team")])
-        local_context = self.env.context.copy()
-        local_context.update({"revision_no": self.revision_version,
-                              "drawing_team_member": self.env.user.name,
-                              "opportunity_name": self.opportunity_id.name})
-        lead_designer_id = self.env['res.groups'].search([('name', '=', 'Contractor')]).id
-        users = self.env["res.users"].search([("groups_id", "=", lead_designer_id)])
-        for user in users:
-            template.with_context(local_context).send_mail(user.id, force_send=True)
+        # template = self.env["mail.template"].search([("name", "=", "Drawing Approved By Drawing Team")])
+        # local_context = self.env.context.copy()
+        # local_context.update({"revision_no": self.revision_version,
+        #                       "drawing_team_member": self.env.user.name,
+        #                       "opportunity_name": self.opportunity_id.name})
+        # lead_designer_id = self.env['res.groups'].search([('name', '=', 'Contractor')]).id
+        # users = self.env["res.users"].search([("groups_id", "=", lead_designer_id)])
+        # for user in users:
+        #     template.with_context(local_context).send_mail(user.id, force_send=True)
         self.write({'state': 'done'
                     })
 
     @api.multi
     def not_approved(self):
         # not approved
-        template = self.env["mail.template"].search([("name", "=", "Drawing Not Approved By Contractor")])
-        local_context = self.env.context.copy()
-        local_context.update({"revision_no": self.revision_version,
-                              "contractor": self.env.user.name,
-                              "opportunity_name": self.opportunity_id.name})
-        lead_designer_id = self.env['res.groups'].search([('name', '=', 'approval drawing team member')]).id
-        users = self.env["res.users"].search([("groups_id", "=", lead_designer_id)])
-        for user in users:
-            template.with_context(local_context).send_mail(user.id, force_send=True)
+        # template = self.env["mail.template"].search([("name", "=", "Drawing Not Approved By Contractor")])
+        # local_context = self.env.context.copy()
+        # local_context.update({"revision_no": self.revision_version,
+        #                       "contractor": self.env.user.name,
+        #                       "opportunity_name": self.opportunity_id.name})
+        # lead_designer_id = self.env['res.groups'].search([('name', '=', 'approval drawing team member')]).id
+        # users = self.env["res.users"].search([("groups_id", "=", lead_designer_id)])
+        # for user in users:
+        #     template.with_context(local_context).send_mail(user.id, force_send=True)
         self.write({
             'state': 'in_progress',
         })

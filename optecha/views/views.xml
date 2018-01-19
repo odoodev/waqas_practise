@@ -168,25 +168,29 @@
             <field name="arch" type="xml">
                 <form string="Workflow record">
                     <header>
-                        <button string="Approve Design" type="object"
-                                name="approved" attrs="{'invisible': [('state', '!=', 'in_progress'),]}"/>
-                        <!--<button string="Not Approved" type="object"-->
-                        <!--name="reset" attrs="{'invisible': [('state', '!=', 'in_progress'),]}"/>-->
+                        <button string="Send to Team Review" type="object"
+                                name="team_review" attrs="{'invisible': [('state', '!=', 'in_progress'),]}"/>
 
-                        <button string="Issue Design to customer" type="object"
-                                name="issued_to_customer"
-                                attrs="{'invisible': [('state','!=','approved')]}"/>
-                        <button string="Engineer Design Review" type="object"
+                        <button string="Approve" type="object"
                                 name="engineer_review"
-                                attrs="{'invisible': [('state','!=','issued_to_customer')]}"/>
+                                attrs="{'invisible': [('state','!=','team_review')]}"/>
+
+                        <button string="Reject" type="object"
+                                name="reset"
+                                attrs="{'invisible': [('state','!=','team_review')]}"/>
+
+
+
                         <button string="Approved" type="object"
                                 name="done"
                                 attrs="{'invisible': [('state','!=','engineer_review')]}"/>
-                        <button string="Not Approved" type="object"
+
+                        <button string="Rejected" type="object"
                                 name="not_approved" attrs="{'invisible': [('state', '!=', 'engineer_review'),]}"/>
+
                         <button string="Reset" type="object"
                                 name="reset"
-                                attrs="{'invisible': [('state', '=', 'in_progress'),]}"/>
+                                attrs="{'invisible': [('state', '!=', 'done'),]}"/>
                         <!--<button string="Reset" type="object"-->
                         <!--name="reset" attrs="{'invisible': [('state', '!=', 'customer_approved')]}"/>-->
 
@@ -218,14 +222,14 @@
         </record>
 
         <record model="ir.actions.act_window" id="optecha_drawing_action">
-            <field name="name">Drawing</field>
+            <field name="name">Approval Drawing</field>
             <field name="res_model">optecha.drawing</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <!--<field name='view_id' ref='view_statusbar_form'/>-->
         </record>
 
-        <menuitem id="menu_optecha_drawing" name="Drawing" action="optecha_drawing_action"
+        <menuitem id="menu_optecha_drawing" name="Approval Drawing" action="optecha_drawing_action"
                   parent="crm.crm_menu_pipeline" sequence="60"/>
 
         <!-- explicit list view definition -->
