@@ -5,12 +5,12 @@
         <!--<delete model="crm.stage" id="stage_lead1" />-->
         <!--<delete model='optecha.optecha' id="stage_lead3" />-->
 
-        <record model="crm.stage" id="stage_lead9">
-            <field name="name">Opportunity</field>
-            <field name="probability">10</field>
-            <field name="on_change">1</field>
-            <field name="sequence">71</field>
-        </record>
+        <!--<record model="crm.stage" id="stage_lead9">-->
+            <!--<field name="name">Opportunity</field>-->
+            <!--<field name="probability">10</field>-->
+            <!--<field name="on_change">1</field>-->
+            <!--<field name="sequence">71</field>-->
+        <!--</record>-->
 
 
         <record model="crm.stage" id="stage_lead10">
