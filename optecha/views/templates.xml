@@ -24,10 +24,10 @@
 	    ]]>
 	  </field>
        </record>
-        <!--<record id="optecha.model_optecha_design" model="ir.model">-->
-            <!--<field name="website_form_access">True</field>-->
-            <!--<field name="website_form_label">Customer</field>-->
-        <!--</record>-->
+        <record id="optecha.model_optecha_design" model="ir.model">
+            <field name="website_form_access">True</field>
+            <field name="website_form_label">Customer</field>
+        </record>
         <!--<function model="ir.model.fields" name="formbuilder_whitelist">-->
             <!--<value>optecha.design</value>-->
             <!--<value eval="['name','designer_id']"/>-->
@@ -46,5 +46,42 @@
                 'vat', 'company_name'
             ]"/>
         </function>-->
+
+
+
+        <record id="drawing_email_template" model="mail.template">
+            <field name="name">Drawing Review</field>
+            <field name="email_from">${(object.email and object.name or '')}</field>
+            <field name="subject">Drawing Review</field>
+            <field name="email_to">${ctx.get("contractor")}</field>
+            <field name="model_id" ref="optecha.model_optecha_drawing"/>
+            <field name="lang">${object.lang}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html">
+            <![CDATA[
+
+
+             <p> <img src="http://52.14.14.217:8069/logo.png" style="width: 80px;margin:0;padding:0;height:auto;"> </p>
+	      <p>Hi ${ctx.get("customer_name")},<br><br>Please see the attached approval drawing version: <b>${ctx.get("revision_no")}</b> and opportunity name: <b>${ctx.get("opportunity_name")} </b>approval drawings for your review. Kindly, confirm voltages, stamp, sign and return approval drawings to Optecha within 5 working days. </p><p>             <br> Best Regards,<br>
+             </p><p>
+
+
+	         </p>
+
+
+
+
+
+	    ]]>
+	  </field>
+       </record>
+        <record id="optecha.model_optecha_drawing" model="ir.model">
+            <field name="website_form_access">True</field>
+            <field name="website_form_label">Customer</field>
+        </record>
+
+
+
+
     </data>
 </odoo>

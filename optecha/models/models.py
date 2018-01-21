@@ -128,7 +128,7 @@ class OptechaDesign(models.Model):
     @api.multi
     def action_quotation_send(self):
         '''
-        This function opens a window to compose an email, with the edi sale template message loaded by default
+        This function opens a window to compose an email, with the edit sale template message loaded by default
         '''
         self.ensure_one()
         ir_model_data = self.env['ir.model.data']
@@ -155,8 +155,8 @@ class OptechaDesign(models.Model):
             'custom_layout': "optecha.mail_template_data_notification_email_optecha",
             'design_file': self.env.context.get('design_file', False),
             'force_email': True,
-            'revision_no':self.revision_version,
-            'opportunity_name':self.opportunity_id.name,
+            'revision_no': self.revision_version,
+            'opportunity_name': self.opportunity_id.name,
             'customer_name': self.opportunity_id.partner_id.name,
             'customer_email': self.opportunity_id.partner_id.email,
 
@@ -181,9 +181,13 @@ class OptechaDrawing(models.Model):
     quotation_id = fields.Many2one('sale.order', string='Quotation', track_visibility='onchange', index=True,
                                    help="Quotation", required=True)
 
+    design_file = fields.Many2many('ir.attachment', 'optechadesign_ir_attachments_rel',
+                                   'optechadesign_id', 'attachment_id', 'Attachments')
+
     project_name = fields.Char('Project Name')
     revision_version = fields.Char('Revision Version')
     version = fields.Char('Drawing Version')
+    contractor_id = fields.Many2one('res.users')
     state = fields.Selection([
         ('in_progress', 'Prepare Approval Drawing Package'),
         ('team_review', 'Optecha Review Approval Drawing Package'),
@@ -232,6 +236,55 @@ class OptechaDrawing(models.Model):
         #     template.with_context(local_context).send_mail(user.id, force_send=True)
         self.write({'state': 'done'
                     })
+
+    @api.multi
+    def action_quotation_send(self):
+        '''
+        This function opens a window to compose an email, with the edi sale template message loaded by default
+        '''
+        self.ensure_one()
+        ir_model_data = self.env['ir.model.data']
+        try:
+            template_ids = ir_model_data.get_object_reference('optecha', 'drawing_email_template')
+            template_id = template_ids[1]
+        except ValueError:
+            template_id = False
+        try:
+            compose_form_id = ir_model_data.get_object_reference('mail', 'email_compose_message_wizard_form')[1]
+        except ValueError:
+            compose_form_id = False
+        template = self.env[template_ids[0]].search([("id", "=", template_ids[1])])
+        template.attachment_ids = None
+        template.attachment_ids = [attachment.id for attachment in self.design_file]
+
+        ctx = {
+            'default_model': 'optecha.drawing',
+            'default_res_id': self.ids[0],
+            'default_use_template': bool(template_id),
+            'default_template_id': template_id,
+            'default_composition_mode': 'comment',
+            'mark_so_as_sent': True,
+            'custom_layout': "optecha.mail_template_data_notification_email_optecha",
+            'design_file': self.env.context.get('design_file', False),
+            'force_email': True,
+            'revision_no': self.revision_version,
+            'opportunity_name': self.opportunity_id.name,
+            'customer_name': self.opportunity_id.partner_id.name,
+            'customer_email': self.opportunity_id.partner_id.email,
+            'drawing_team_member': self.env.user.name,
+            'contractor': self.contractor_id.email
+
+        }
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'target': 'new',
+            'context': ctx,
+        }
 
     @api.multi
     def not_approved(self):

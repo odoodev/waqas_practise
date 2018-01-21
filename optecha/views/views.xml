@@ -191,6 +191,11 @@
                         <button string="Reset" type="object"
                                 name="reset"
                                 attrs="{'invisible': [('state', '!=', 'done'),]}"/>
+
+                        <button name="action_quotation_send" string="Send by Email" type="object"
+                                attrs="{'invisible': [('state','!=','engineer_review')]}" class="btn-primary"
+                         />
+
                         <!--<button string="Reset" type="object"-->
                         <!--name="reset" attrs="{'invisible': [('state', '!=', 'customer_approved')]}"/>-->
 
@@ -203,6 +208,9 @@
                         <field name="project_name"/>
                         <field name="revision_version"/>
                         <field name="version"/>
+                        <field name="contractor_id" string="Contractor/Engineer"/>
+                        <field name="design_file" filename="my_file_fname" widget="many2many_binary"/>
+
                     </group>
                 </form>
             </field>
