@@ -312,15 +312,19 @@ class OptechaDrawing(models.Model):
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
+    quotation_fees_id = fields.One2many('sale.order', "opportunity_id", "Design Fees", readonly=True)
+    po_order = fields.One2many('purchase.order', "opportunity_id", "Purchase Orders", readonly=True)
     design_id = fields.One2many('optecha.design', "opportunity_id", 'Design', readonly=False)
     drawing_id = fields.One2many('optecha.drawing', "opportunity_id", "Drawing", readonly=False)
-    quotation_id = fields.One2many('sale.order', "opportunity_id", "Drawing", readonly=True)
+    quotation_id = fields.One2many('sale.order', "opportunity_id", "Quotation", readonly=True)
     select_design = fields.Many2one('optecha.design', string='Select Design', track_visibility='onchange', index=True,
                                     help="Design")
     project_name = fields.Char('Project Name')
     project_location = fields.Char('Project Location')
     revision_version = fields.Char('Revision version')
     project_completion_date = fields.Date('Expected Completion Date')
+    distributor_id = fields.Many2one('res.partner', string="Distributor Name", domain="[('category_id','=','Distributor')]")
+    distributor_active = fields.Boolean('Active Distributor')
 
     @api.multi
     @api.onchange("stage_id")
@@ -369,6 +373,7 @@ class OptechaProducts(models.Model):
 class OptechaQuotation(models.Model):
     _inherit = 'sale.order'
 
+    dis_id = fields.Many2many('res.partner.category',"Distributor", related="partner_id.category_id")
     project_name = fields.Char("Project_name")
     project_location = fields.Char("Project_location")
     project_completion_date = fields.Date('Expected Completion Date')
@@ -394,3 +399,12 @@ class OptechaSaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     optecha_type = fields.Char('Type')
+
+
+class OptechaPurchaseOrderLine(models.Model):
+    _inherit = 'purchase.order'
+
+
+    opportunity_id = fields.Many2one('crm.lead', string='Opportunity', track_visibility='onchange', index=True,
+                                     help="Opportunity")
+    dis_id = fields.Many2many('res.partner.category',"Distributor", related="partner_id.category_id")

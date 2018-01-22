@@ -1,10 +1,45 @@
 <odoo>
     <data>
+        <record id="sale_action_quotations_new_distribution" model="ir.actions.act_window">
+        <field name="name">Quotation</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">form,tree,graph</field>
+        <field name="domain">[('opportunity_id', '=', active_id)]</field>
+        <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id}</field>
+    </record>
+        <record id="purchase_action_quotations_new_distribution" model="ir.actions.act_window">
+        <field name="name">Quotation</field>
+        <field name="res_model">purchase.order</field>
+        <field name="view_mode">form,tree,graph</field>
+        <field name="domain">[('opportunity_id', '=', active_id)]</field>
+        <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id}</field>
+    </record>
         <record model="ir.ui.view" id="lead_form_inherit">
             <field name="name">lead.form.inherit</field>
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
             <field name="arch" type="xml">
+                <field name="date_deadline" position="after">
+                    <field name="distributor_active"/>
+                    <field name="distributor_id" attrs="{'invisible':[('distributor_active','=',False)]}"/>
+                </field>
+                <xpath expr="//button[@name='action_set_won']" position="after">
+                    <button string="Distributor Quote" name="%(sale_action_quotations_new_distribution)d" type="action" class="oe_highlight"
+                        context="{'search_default_partner_id': distributor_id,
+                                  'default_partner_id': distributor_id,
+                                  'default_team_id': team_id,
+                                  'default_campaign_id': campaign_id,
+                                  'default_medium_id': medium_id,
+                                  'default_source_id': source_id}"
+                    attrs="{'invisible':[('distributor_active','=',False)]}"/>
+                    <button string="P.O QUOTE" name="%(purchase_action_quotations_new_distribution)d" type="action" class="oe_highlight"
+                        context="{'search_default_partner_id': distributor_id,
+                                  'default_partner_id': distributor_id,
+                                  'default_team_id': team_id,
+                                  'default_campaign_id': campaign_id,
+                                  'default_medium_id': medium_id,
+                                  'default_source_id': source_id}"/>
+                </xpath>
 
                 <!--<field name="phone" position="after">-->
                 <!--<field name="select_design" domain="[('opportunity_id', '=', id)]" />-->
@@ -30,6 +65,17 @@
                             <field name="drawing_id"/>
                         </group>
                     </page>
+                    <page name="purchase" string="PO">
+                        <group>
+                            <field name="po_order"/>
+                        </group>
+                    </page>
+                    <!--<page name="design_fees" string="Design Fees"
+                          attrs="{'invisible':[('distributor_active','=',False)]}">
+                        <group>
+                            <field name="quotation_fees_id"/>
+                        </group>
+                    </page>-->
                 </notebook>
             </field>
         </record>
@@ -305,6 +351,11 @@
                 <xpath expr="//sheet/notebook/page/field/form/group/group/field[@name='product_id']" position="after">
                     <field name="optecha_type"/>
                 </xpath>
+<!--
+                <field name="partner_id" position="after">
+                    <field name="dis_id" widget="many2many_tags"/>
+                </field>
+-->
 
                 <xpath expr="//sheet/notebook/page/field/tree/field[@name='product_id']" position="after">
                     <field name="optecha_type"/>
@@ -371,6 +422,36 @@
             <!--<field name="implied_ids" eval="[(4, ref('optecha_contractor_team_member_group'))]" />-->
             <!--<field name="category_id" ref="category_optecha_management"/>-->
         <!--</record>-->
+        <record model="ir.ui.view" id="Quotation_form_purchase_inherit">
+            <field name="name">quotation.form.inherit</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <field name="date_approve" position="after">
+                    <field name="opportunity_id"/>
+                </field>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="Quotation_form_purchase_inherit">
+            <field name="name">quotation.form.inherit</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+            <field name="arch" type="xml">
+                <field name="state" position="after">
+                    <field name="dis_id" widget="many2many_tags"/>
+                </field>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="Quotation_form_sale_tree_inherit">
+            <field name="name">quotation.tree.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <field name="state" position="after">
+                    <field name="dis_id" widget="many2many_tags"/>
+                </field>
+            </field>
+        </record>
 
     </data>
 </odoo>

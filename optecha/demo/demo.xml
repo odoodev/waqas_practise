@@ -41,6 +41,25 @@
             <field name="on_change">1</field>
             <field name="sequence">75</field>
         </record>
+        <record model="crm.stage" id="stage_lead14">
+            <field name="name">PO</field>
+            <field name="probability">60</field>
+            <field name="on_change">1</field>
+            <field name="sequence">76</field>
+        </record>
+
+        <record model="crm.stage" id="stage_lead15">
+            <field name="name">Delivered</field>
+            <field name="probability">70</field>
+            <field name="on_change">1</field>
+            <field name="sequence">77</field>
+        </record>
+        <record model="crm.stage" id="stage_lead16">
+            <field name="name">Invoice</field>
+            <field name="probability">80</field>
+            <field name="on_change">1</field>
+            <field name="sequence">78</field>
+        </record>
 
         <!--  -->
         <!--   <record id="object0" model="optecha.optecha"> -->
