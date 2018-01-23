@@ -60,7 +60,7 @@
                             <field name="quotation_id"/>
                         </group>
                     </page>
-                    <page name="drawing" string="Drawing">
+                    <page name="drawing" string="Approval Drawing">
                         <group>
                             <field name="drawing_id"/>
                         </group>
@@ -187,6 +187,7 @@
                     <field name="project_location"/>
                     <field name="opportunity_id"/>
                     <field name="designer_id"/>
+                    <field name="revision_version" />
                     <field name="state"/>
                 </tree>
             </field>
@@ -222,10 +223,8 @@
                                 attrs="{'invisible': [('state','!=','team_review')]}"/>
 
                         <button string="Reject" type="object"
-                                name="reset"
+                                name="team_reject"
                                 attrs="{'invisible': [('state','!=','team_review')]}"/>
-
-
 
                         <button string="Approved" type="object"
                                 name="done"

@@ -158,7 +158,7 @@ class OptechaDesign(models.Model):
             'revision_no': self.revision_version,
             'opportunity_name': self.opportunity_id.name,
             'customer_name': self.opportunity_id.partner_id.name,
-            'customer_email': self.opportunity_id.partner_id.email,
+            'customer_email': self.opportunity_id.partner_id.email
 
         }
         return {
@@ -208,19 +208,36 @@ class OptechaDrawing(models.Model):
 
     @api.multi
     def team_review(self):
+        template = self.env["mail.template"].search([("name", "=", "Drawing Team Review")])
+        local_context = self.env.context.copy()
+        local_context.update({"drawing_version": self.version,
+                              "drawing_name": self.name,
+                              "opportunity_name": self.opportunity_id.name})
+        lead_drawing_id = self.env['res.groups'].search([('name', '=', 'Drawing Team Lead')]).id
+        users = self.env["res.users"].search([("groups_id", "=", lead_drawing_id)])
+        for user in users:
+            template.with_context(local_context).send_mail(user.id, force_send=True)
+
         self.write({
             'state': 'team_review',
         })
 
     @api.multi
-    def issued_to_customer(self):
-        self.write({'state': 'issued_to_customer'
-                    })
-
-    @api.multi
     def engineer_review(self):
         self.write({'state': 'engineer_review'
                     })
+
+    @api.multi
+    def team_reject(self):
+        template = self.env["mail.template"].search([("name", "=", "Drawing Reject By Team")])
+        local_context = self.env.context.copy()
+        local_context.update({"drawing_version": self.version,
+                              "drawing_name": self.name,
+                              "opportunity_name": self.opportunity_id.name})
+        template.with_context(local_context).send_mail(4, force_send=True)
+        self.write({
+            'state': 'in_progress',
+        })
 
     @api.multi
     def done(self):
@@ -403,7 +420,6 @@ class OptechaSaleOrderLine(models.Model):
 
 class OptechaPurchaseOrderLine(models.Model):
     _inherit = 'purchase.order'
-
 
     opportunity_id = fields.Many2one('crm.lead', string='Opportunity', track_visibility='onchange', index=True,
                                      help="Opportunity")

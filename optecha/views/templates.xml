@@ -4,9 +4,10 @@
 
         <record id="example_email_template" model="mail.template">
             <field name="name">Customer Review</field>
-            <field name="email_from">${(object.email and object.name or '')}</field>
-            <field name="subject">Customer Review</field>
+            <field name="email_from"> Optecha &lt;${object.designer_id.email}&gt; </field>
+            <field name="subject">${object.name} -R${ctx.get("revision_no")} Design</field>
             <field name="email_to">${object.opportunity_id.partner_id.email|safe}</field>
+            <field name="reply_to">${object.designer_id.name} &lt; ${object.designer_id.email}&gt; </field>
             <field name="model_id" ref="optecha.model_optecha_design"/>
             <field name="lang">${object.lang}</field>
             <field name="auto_delete" eval="True"/>
