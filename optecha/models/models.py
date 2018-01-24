@@ -192,7 +192,8 @@ class OptechaDrawing(models.Model):
         ('in_progress', 'Prepare Approval Drawing Package'),
         ('team_review', 'Optecha Review Approval Drawing Package'),
         ('engineer_review', 'Contractor/Engineer Review Approval Drawing Package'),
-        ('done', 'Done')
+        ('done', 'Done'),
+        ('out_to_date', 'Out To Date')
     ], default='in_progress')
 
     @api.onchange("quotation_id")
@@ -229,12 +230,12 @@ class OptechaDrawing(models.Model):
 
     @api.multi
     def team_reject(self):
-        template = self.env["mail.template"].search([("name", "=", "Drawing Reject By Team")])
+        template = self.env["mail.template"].search([("name", "=", "Drawing Rejected By Team")])
         local_context = self.env.context.copy()
         local_context.update({"drawing_version": self.version,
                               "drawing_name": self.name,
                               "opportunity_name": self.opportunity_id.name})
-        template.with_context(local_context).send_mail(4, force_send=True)
+        template.with_context(local_context).send_mail(8, force_send=True)
         self.write({
             'state': 'in_progress',
         })
@@ -304,17 +305,17 @@ class OptechaDrawing(models.Model):
         }
 
     @api.multi
-    def not_approved(self):
+    def rejected_by_contractor(self):
         # not approved
-        # template = self.env["mail.template"].search([("name", "=", "Drawing Not Approved By Contractor")])
-        # local_context = self.env.context.copy()
-        # local_context.update({"revision_no": self.revision_version,
-        #                       "contractor": self.env.user.name,
-        #                       "opportunity_name": self.opportunity_id.name})
-        # lead_designer_id = self.env['res.groups'].search([('name', '=', 'approval drawing team member')]).id
-        # users = self.env["res.users"].search([("groups_id", "=", lead_designer_id)])
-        # for user in users:
-        #     template.with_context(local_context).send_mail(user.id, force_send=True)
+        template = self.env["mail.template"].search([("name", "=", "Drawing Rejected By Contractor")])
+        local_context = self.env.context.copy()
+        local_context.update({"revision_no": self.revision_version,
+                              "contractor": self.env.user.name,
+                              "opportunity_name": self.opportunity_id.name})
+        drawing_lead_id = self.env['res.groups'].search([('name', '=', 'Drawing Team Lead')]).id
+        users = self.env["res.users"].search([("groups_id", "=", drawing_lead_id)])
+        for user in users:
+            template.with_context(local_context).send_mail(user.id, force_send=True)
         self.write({
             'state': 'in_progress',
         })
@@ -323,6 +324,18 @@ class OptechaDrawing(models.Model):
     def reset(self):
         self.write({
             'state': 'in_progress',
+        })
+
+    @api.multi
+    def out_to_date(self):
+        self.write({
+            'state': 'out_to_date',
+        })
+
+    @api.multi
+    def back_to_done(self):
+        self.write({
+            'state': 'done',
         })
 
 

@@ -231,11 +231,19 @@
                                 attrs="{'invisible': [('state','!=','engineer_review')]}"/>
 
                         <button string="Rejected" type="object"
-                                name="not_approved" attrs="{'invisible': [('state', '!=', 'engineer_review'),]}"/>
+                                name="rejected_by_contractor" attrs="{'invisible': [('state', '!=', 'engineer_review'),]}"/>
 
                         <button string="Reset" type="object"
                                 name="reset"
                                 attrs="{'invisible': [('state', '!=', 'done'),]}"/>
+
+                        <button string="Out To Date" type="object"
+                                name="out_to_date"
+                                attrs="{'invisible': [('state', '!=', 'done'),]}"/>
+
+                        <button string="Back To Done" type="object"
+                                name="back_to_done"
+                                attrs="{'invisible': [('state', '!=', 'out_to_date'),]}"/>
 
                         <button name="action_quotation_send" string="Send by Email" type="object"
                                 attrs="{'invisible': [('state','!=','engineer_review')]}" class="btn-primary"
@@ -270,6 +278,7 @@
                     <field name="name"/>
                     <field name="opportunity_id"/>
                     <field name="version"/>
+                    <field name="state"/>
                 </tree>
             </field>
         </record>
