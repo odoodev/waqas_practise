@@ -17,7 +17,7 @@
 
                          <p> <img src="http://52.14.14.217:8069/logo.png" style="width: 80px;margin:0;padding:0;height:auto;"> </p>
 	      <p>Hi ${ctx.get("customer_name")},<br><br>Here is the completed revision no: <b>${ctx.get("revision_no")}</b> and opportunity name: <b>${ctx.get("opportunity_name")} </b>design for your review. </p><p><br> Best Regards,</p>
-
+	            <p><br>${user.signature | safe}</p>
 
 
 	  
@@ -69,7 +69,7 @@
 
 	         </p>
 
-
+              <p><br>${user.signature | safe}</p>
 
 
 

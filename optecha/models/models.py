@@ -152,7 +152,7 @@ class OptechaDesign(models.Model):
             'default_template_id': template_id,
             'default_composition_mode': 'comment',
             'mark_so_as_sent': True,
-            'custom_layout': "optecha.mail_template_data_notification_email_optecha",
+            'custom_layout': "sale.mail_template_data_notification_email_sale_order",
             'design_file': self.env.context.get('design_file', False),
             'force_email': True,
             'revision_no': self.revision_version,
@@ -188,6 +188,7 @@ class OptechaDrawing(models.Model):
     revision_version = fields.Char('Revision Version')
     version = fields.Char('Drawing Version')
     contractor_id = fields.Many2one('res.users')
+    assign_to = fields.Many2one('res.users')
     state = fields.Selection([
         ('in_progress', 'Prepare Approval Drawing Package'),
         ('team_review', 'Optecha Review Approval Drawing Package'),
@@ -235,7 +236,7 @@ class OptechaDrawing(models.Model):
         local_context.update({"drawing_version": self.version,
                               "drawing_name": self.name,
                               "opportunity_name": self.opportunity_id.name})
-        template.with_context(local_context).send_mail(8, force_send=True)
+        template.with_context(local_context).send_mail(self.assign_to.id, force_send=True)
         self.write({
             'state': 'in_progress',
         })
@@ -282,7 +283,7 @@ class OptechaDrawing(models.Model):
             'default_template_id': template_id,
             'default_composition_mode': 'comment',
             'mark_so_as_sent': True,
-            'custom_layout': "optecha.mail_template_data_notification_email_optecha",
+            'custom_layout': "sale.mail_template_data_notification_email_sale_order",
             'design_file': self.env.context.get('design_file', False),
             'force_email': True,
             'revision_no': self.revision_version,

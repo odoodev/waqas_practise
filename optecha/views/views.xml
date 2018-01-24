@@ -262,6 +262,7 @@
                         <field name="revision_version"/>
                         <field name="version"/>
                         <field name="contractor_id" string="Contractor/Engineer"/>
+                        <field name="assign_to" string="Assign to"/>
                         <field name="design_file" filename="my_file_fname" widget="many2many_binary"/>
 
                     </group>
