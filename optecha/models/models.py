@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-
+from odoo.osv import osv
+from datetime import datetime
 
 class OptechaDesign(models.Model):
     _name = 'optecha.design'
@@ -12,7 +13,8 @@ class OptechaDesign(models.Model):
     project_completion_date = fields.Date('Expected Completion Date')
     revision_version = fields.Char("Revision version")
     status = fields.Selection([('ifr', 'IFR'), ('ifc', 'IFC')])
-    # opportunity_name = fields.Char('Opportunity')
+    state_date = fields.Datetime(default=fields.Datetime.now)
+    no_of_days = fields.Float(compute='_compute_no_of_days', string='Number of Days', store=True)
 
     @api.model
     def _get_designer_id(self):
@@ -27,18 +29,29 @@ class OptechaDesign(models.Model):
     design_file = fields.Many2many('ir.attachment', 'optechadesign_ir_attachments_rel',
                                    'optechadesign_id', 'attachment_id', 'Attachments')
 
-
-    """
-    This selection field contains all the possible values for the statusbar.
-    The first part is the database value, the second is the string that is showed. Example:
-    ('finished','Done'). 'finished' is the database key and 'Done' the value shown to the user
-    """
     state = fields.Selection([
         ('in_progress', 'Design In Progress'),
         ('team_review', 'Design Team Review'),
         ('customer_review', 'Customer Review'),
         ('done', 'Done')
         ], default='in_progress')
+
+    @api.onchange("state")
+    def update_date(self):
+        """
+
+        :return:
+        """
+        self.state_date = fields.Datetime.now()
+
+    @api.depends("state_date")
+    def _compute_no_of_days(self):
+        """ Compute difference between current date and log date """
+        print("waqas")
+        for design in self:
+            state_date_time = fields.Datetime.from_string(design.state_date)
+            current_date_time = fields.Datetime.from_string(fields.Datetime.now())
+            design.no_of_days = abs(current_date_time - state_date_time).days
 
     @api.model
     def create(self, values):
@@ -189,6 +202,7 @@ class OptechaDrawing(models.Model):
     version = fields.Char('Drawing Version')
     contractor_id = fields.Many2one('res.users')
     assign_to = fields.Many2one('res.users')
+    comment = fields.Text(string="Review Comments")
     state = fields.Selection([
         ('in_progress', 'Prepare Approval Drawing Package'),
         ('team_review', 'Optecha Review Approval Drawing Package'),
@@ -231,15 +245,23 @@ class OptechaDrawing(models.Model):
 
     @api.multi
     def team_reject(self):
-        template = self.env["mail.template"].search([("name", "=", "Drawing Rejected By Team")])
-        local_context = self.env.context.copy()
-        local_context.update({"drawing_version": self.version,
-                              "drawing_name": self.name,
-                              "opportunity_name": self.opportunity_id.name})
-        template.with_context(local_context).send_mail(self.assign_to.id, force_send=True)
-        self.write({
-            'state': 'in_progress',
-        })
+        if self.comment != '<p><br></p>':
+            template = self.env["mail.template"].search([("name", "=", "Drawing Rejected By Team")])
+            temp = template["body_html"]
+            temporary = template["body_html"].split("adha_kr_dy")
+            # as format and other specifier % for string were not working.
+            template["body_html"] = temporary[0] + self.comment + temporary[1]
+            local_context = self.env.context.copy()
+            local_context.update({"drawing_version": self.version,
+                                  "drawing_name": self.name,
+                                  "opportunity_name": self.opportunity_id.name})
+            template.with_context(local_context).send_mail(self.assign_to.id, force_send=True)
+            template["body_html"] = temp
+            self.write({
+                'state': 'in_progress',
+            })
+        else:
+            raise osv.except_osv(('Error'), ('Kindly mention reasons of rejection in Review Comments box'))
 
     @api.multi
     def done(self):
