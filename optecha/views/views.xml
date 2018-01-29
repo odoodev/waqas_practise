@@ -134,7 +134,7 @@
                             attrs="{'invisible': [('state','!=','team_review')]}"/>
 
                     <button string="Reject" type="object"
-                            name="reset"
+                            name="reject_reset"
                             attrs="{'invisible': [('state','!=','team_review')]}"/>
 
                     <button string="Approved" type="object"
@@ -165,7 +165,6 @@
                     <field name="designer_id"/>
                     <field name="architect_id"/>
                     <field name="design_file" filename="my_file_fname" widget="many2many_binary"/>
-                    <field name="state_date" />
                 </group>
             </form>
         </field>

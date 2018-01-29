@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-
+from werkzeug.urls import url_encode
 from odoo import models, fields, api, _
 from odoo.osv import osv
-from datetime import datetime
+from odoo.exceptions import UserError, AccessError
+
 
 class OptechaDesign(models.Model):
     _name = 'optecha.design'
@@ -13,7 +14,7 @@ class OptechaDesign(models.Model):
     project_completion_date = fields.Date('Expected Completion Date')
     revision_version = fields.Char("Revision version")
     status = fields.Selection([('ifr', 'IFR'), ('ifc', 'IFC')])
-    state_date = fields.Datetime(default=fields.Datetime.now)
+    state_date = fields.Datetime(default=fields.Datetime.now,store=True)
     no_of_days = fields.Float(compute='_compute_no_of_days', string='Number of Days', store=True)
 
     @api.model
@@ -36,19 +37,12 @@ class OptechaDesign(models.Model):
         ('done', 'Done')
         ], default='in_progress')
 
-    @api.onchange("state")
-    def update_date(self):
-        """
-
-        :return:
-        """
-        self.state_date = fields.Datetime.now()
-
     @api.depends("state_date")
     def _compute_no_of_days(self):
         """ Compute difference between current date and log date """
-        print("waqas")
         for design in self:
+            if design.state_date:
+                design.state_date = fields.Datetime.now()
             state_date_time = fields.Datetime.from_string(design.state_date)
             current_date_time = fields.Datetime.from_string(fields.Datetime.now())
             design.no_of_days = abs(current_date_time - state_date_time).days
@@ -69,10 +63,12 @@ class OptechaDesign(models.Model):
 
     @api.multi
     def team_review(self):
+        self.update_no_of_days()
         template = self.env["mail.template"].search([("name", "=", "Team Review")])
         local_context = self.env.context.copy()
         local_context.update({"revision_no": self.revision_version,
-                              "opportunity_name": self.opportunity_id.name})
+                              "opportunity_name": self.opportunity_id.name,
+                              "share_url": self.get_share_url()})
         lead_designer_id = self.env['res.groups'].search([('name', '=', 'Lead Designer')]).id
         users = self.env["res.users"].search([("groups_id", "=", lead_designer_id)])
         for user in users:
@@ -80,6 +76,7 @@ class OptechaDesign(models.Model):
         self.write({
             'state': 'team_review',
         })
+        self.state_date = fields.Datetime.now()
 
     @api.multi
     def customer_review(self):
@@ -94,6 +91,7 @@ class OptechaDesign(models.Model):
         self.write({
             'state': 'customer_review',
         })
+        self.state_date = fields.Datetime.now()
  
     @api.multi
     def done(self):
@@ -108,13 +106,15 @@ class OptechaDesign(models.Model):
         self.write({
             'state': 'done',
         })
+        self.state_date = fields.Datetime.now()
 
     @api.multi
-    def reset(self):
+    def reject_reset(self):
         template = self.env["mail.template"].search([("name", "=", "Design Rejected By Design Team")])
         local_context = self.env.context.copy()
         local_context.update({"revision_no": self.revision_version,
-                              "opportunity_name": self.opportunity_id.name})
+                              "opportunity_name": self.opportunity_id.name,
+                              "share_url": self.get_share_url()})
         # lead_designer_id = self.env['res.groups'].search([('name', '=', 'Designer')]).id
         users = self.env["res.users"].search([("email", "=", self.designer_id[0].email)])
         for user in users:
@@ -122,6 +122,23 @@ class OptechaDesign(models.Model):
         self.write({
             'state': 'in_progress',
         })
+        self.state_date = fields.Datetime.now()
+
+    @api.multi
+    def reset(self):
+        # template = self.env["mail.template"].search([("name", "=", "Design Rejected By Design Team")])
+        # local_context = self.env.context.copy()
+        # local_context.update({"revision_no": self.revision_version,
+        #                       "opportunity_name": self.opportunity_id.name,
+        #                       "share_url": self.get_mail_url()})
+        # # lead_designer_id = self.env['res.groups'].search([('name', '=', 'Designer')]).id
+        # users = self.env["res.users"].search([("email", "=", self.designer_id[0].email)])
+        # for user in users:
+        #     template.with_context(local_context).send_mail(user.id, force_send=True)
+        self.write({
+            'state': 'in_progress',
+        })
+        self.state_date = fields.Datetime.now()
 
     @api.multi
     def reset_by_customer(self):
@@ -129,7 +146,8 @@ class OptechaDesign(models.Model):
         local_context = self.env.context.copy()
         local_context.update({"revision_no": self.revision_version,
                               "customer_name": self.env.user.name,
-                              "opportunity_name": self.opportunity_id.name})
+                              "opportunity_name": self.opportunity_id.name,
+                              "share_url": self.get_share_url()})
         # lead_designer_id = self.env['res.groups'].search([('name', '=', 'Designer')]).id
         users = self.env["res.users"].search([("email", "=", self.designer_id[0].email)])
         for user in users:
@@ -137,6 +155,7 @@ class OptechaDesign(models.Model):
         self.write({
             'state': 'in_progress',
         })
+        self.state_date = fields.Datetime.now()
 
     @api.multi
     def action_quotation_send(self):
@@ -185,6 +204,28 @@ class OptechaDesign(models.Model):
             'context': ctx,
         }
 
+    def get_share_url(self):
+        self.ensure_one()
+        params = {
+            'model': self._name,
+            'res_id': self.id,
+        }
+        if hasattr(self, 'access_token') and self.access_token:
+            params['access_token'] = self.access_token
+        if hasattr(self, 'partner_id') and self.partner_id:
+            params.update(self.partner_id.signup_get_auth_param()[self.partner_id.id])
+
+        return '/mail/view?' + url_encode(params)
+
+    def update_no_of_days(self):
+        """
+
+        :return:
+        """
+        all_object = self.env["optecha.design"].search([])
+        for obj in all_object:
+            obj._compute_no_of_days()
+
 
 class OptechaDrawing(models.Model):
     _name = 'optecha.drawing'
@@ -228,7 +269,8 @@ class OptechaDrawing(models.Model):
         local_context = self.env.context.copy()
         local_context.update({"drawing_version": self.version,
                               "drawing_name": self.name,
-                              "opportunity_name": self.opportunity_id.name})
+                              "opportunity_name": self.opportunity_id.name,
+                              "share_url": self.get_share_url()})
         lead_drawing_id = self.env['res.groups'].search([('name', '=', 'Drawing Team Lead')]).id
         users = self.env["res.users"].search([("groups_id", "=", lead_drawing_id)])
         for user in users:
@@ -254,7 +296,8 @@ class OptechaDrawing(models.Model):
             local_context = self.env.context.copy()
             local_context.update({"drawing_version": self.version,
                                   "drawing_name": self.name,
-                                  "opportunity_name": self.opportunity_id.name})
+                                  "opportunity_name": self.opportunity_id.name,
+                                  "share_url": self.get_share_url()})
             template.with_context(local_context).send_mail(self.assign_to.id, force_send=True)
             template["body_html"] = temp
             self.write({
@@ -327,6 +370,19 @@ class OptechaDrawing(models.Model):
             'context': ctx,
         }
 
+    def get_share_url(self):
+        self.ensure_one()
+        params = {
+            'model': self._name,
+            'res_id': self.id,
+        }
+        if hasattr(self, 'access_token') and self.access_token:
+            params['access_token'] = self.access_token
+        if hasattr(self, 'partner_id') and self.partner_id:
+            params.update(self.partner_id.signup_get_auth_param()[self.partner_id.id])
+
+        return '/mail/view?' + url_encode(params)
+
     @api.multi
     def rejected_by_contractor(self):
         # not approved
@@ -334,7 +390,8 @@ class OptechaDrawing(models.Model):
         local_context = self.env.context.copy()
         local_context.update({"revision_no": self.revision_version,
                               "contractor": self.env.user.name,
-                              "opportunity_name": self.opportunity_id.name})
+                              "opportunity_name": self.opportunity_id.name,
+                              "share_url": self.get_share_url()})
         drawing_lead_id = self.env['res.groups'].search([('name', '=', 'Drawing Team Lead')]).id
         users = self.env["res.users"].search([("groups_id", "=", drawing_lead_id)])
         for user in users:
