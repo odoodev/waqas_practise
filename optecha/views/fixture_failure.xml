@@ -1,0 +1,94 @@
+<odoo>
+    <data>
+         <record model="ir.ui.view" id="optecha_fixture_failure_form">
+            <field name="name">optecha.fixture_failure.form</field>
+            <field name="model">optecha.fixture_failure</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Workflow record">
+                    <header>
+                        <button string="Send to Team Review" type="object"
+                                name="team_review" attrs="{'invisible': [('state', '!=', 'in_progress'),]}"/>
+
+                        <button string="Approve" type="object"
+                                name="engineer_review"
+                                attrs="{'invisible': [('state','!=','team_review')]}"/>
+
+                        <button string="Reject" type="object"
+                                name="team_reject"
+                                attrs="{'invisible': [('state','!=','team_review')]}"/>
+
+                        <button string="Approved" type="object"
+                                name="done"
+                                attrs="{'invisible': [('state','!=','engineer_review')]}"/>
+
+                        <button string="Rejected" type="object"
+                                name="rejected_by_contractor" attrs="{'invisible': [('state', '!=', 'engineer_review'),]}"/>
+
+                        <button string="Reset" type="object"
+                                name="reset"
+                                attrs="{'invisible': [('state', '!=', 'done'),]}"/>
+
+                        <button string="Out To Date" type="object"
+                                name="out_to_date"
+                                attrs="{'invisible': [('state', '!=', 'done'),]}"/>
+
+                        <button string="Back To Done" type="object"
+                                name="back_to_done"
+                                attrs="{'invisible': [('state', '!=', 'out_to_date'),]}"/>
+
+                        <button name="action_quotation_send" string="Send by Email" type="object"
+                                attrs="{'invisible': [('state','!=','engineer_review')]}" class="btn-primary"
+                         />
+
+                        <!--<button string="Reset" type="object"-->
+                        <!--name="reset" attrs="{'invisible': [('state', '!=', 'customer_approved')]}"/>-->
+
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <group>
+                        <field name="name"/>
+                        <field name="opportunity_id"/>
+                        <field name="quotation_id" domain="[('opportunity_id', '=', opportunity_id)]"/>
+                        <field name="project_name"/>
+                        <field name="revision_version"/>
+                        <field name="version"/>
+                        <field name="contractor_id" string="Contractor/Engineer"/>
+                        <field name="assign_to" string="Assign to"/>
+                        <field name="design_file" filename="my_file_fname" widget="many2many_binary"/>
+                        <field name="comment" widget="html" attrs="{'invisible': [('state','!=','team_review')]}" />
+
+
+                    </group>
+                </form>
+            </field>
+         </record>
+
+         <record model="ir.actions.act_window" id="optecha_fixture_failure">
+            <field name="name">Fixture Failure</field>
+            <field name="res_model">optecha.fixture_failure</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+
+         </record>
+
+         <record model="ir.ui.view" id="optecha_fixture_failure_tree">
+            <field name="name">optecha.fixture_failure_tree</field>
+            <field name="model">optecha.fixture_failure</field>
+            <field name="priority" eval="16"/>
+            <field name="arch" type="xml">
+                <tree string="tree view">
+                    <field name="name"/>
+                    <field name="opportunity_id"/>
+                    <field name="version"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+         <menuitem id="menu_optecha_fixture_failure" name="Fixture Failure" action="optecha_fixture_failure"
+                  parent="crm.crm_menu_pipeline" sequence="70"/>
+
+
+    </data>
+</odoo>

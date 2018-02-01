@@ -14,7 +14,7 @@ class OptechaDesign(models.Model):
     project_completion_date = fields.Date('Expected Completion Date')
     revision_version = fields.Char("Revision version")
     status = fields.Selection([('ifr', 'IFR'), ('ifc', 'IFC')])
-    state_date = fields.Datetime(default=fields.Datetime.now,store=True)
+    state_date = fields.Datetime(default=fields.Datetime.now, store=True)
     no_of_days = fields.Float(compute='_compute_no_of_days', string='Number of Days', store=True)
 
     @api.model
@@ -41,8 +41,6 @@ class OptechaDesign(models.Model):
     def _compute_no_of_days(self):
         """ Compute difference between current date and log date """
         for design in self:
-            if design.state_date:
-                design.state_date = fields.Datetime.now()
             state_date_time = fields.Datetime.from_string(design.state_date)
             current_date_time = fields.Datetime.from_string(fields.Datetime.now())
             design.no_of_days = abs(current_date_time - state_date_time).days
@@ -57,7 +55,8 @@ class OptechaDesign(models.Model):
         record = super(OptechaDesign, self).create(values)
         template = self.env["mail.template"].search([("name", "=", "Prepare Design")])
         local_context = self.env.context.copy()
-        local_context.update({"design_name": values["name"]})
+        local_context.update({"design_name": values["name"],
+                              "share_url": self.get_share_url(record.id)})
         template.with_context(local_context).send_mail(values["designer_id"], force_send=True)
         return record
 
@@ -98,7 +97,8 @@ class OptechaDesign(models.Model):
         template = self.env["mail.template"].search([("name", "=", "Design Approved By Customer")])
         local_context = self.env.context.copy()
         local_context.update({"revision_no": self.revision_version,
-                              "opportunity_name": self.opportunity_id.name})
+                              "opportunity_name": self.opportunity_id.name,
+                              "share_url": self.get_share_url()})
         lead_designer_id = self.env['res.groups'].search([('name', '=', 'quote team member')]).id
         users = self.env["res.users"].search([("groups_id", "=", lead_designer_id)])
         for user in users:
@@ -204,11 +204,11 @@ class OptechaDesign(models.Model):
             'context': ctx,
         }
 
-    def get_share_url(self):
-        self.ensure_one()
+    def get_share_url(self, id=None):
+        # self.ensure_one()
         params = {
             'model': self._name,
-            'res_id': self.id,
+            'res_id': id if id else self.id,
         }
         if hasattr(self, 'access_token') and self.access_token:
             params['access_token'] = self.access_token
@@ -251,6 +251,21 @@ class OptechaDrawing(models.Model):
         ('done', 'Done'),
         ('out_to_date', 'Out To Date')
     ], default='in_progress')
+
+    @api.model
+    def create(self, values):
+        """
+
+        :param values:
+        :return:
+        """
+        record = super(OptechaDrawing, self).create(values)
+        template = self.env["mail.template"].search([("name", "=", "Prepare Drawing")])
+        local_context = self.env.context.copy()
+        local_context.update({"drawing_name": values["name"],
+                              "share_url": self.get_share_url(record.id)})
+        template.with_context(local_context).send_mail(values["assign_to"], force_send=True)
+        return record
 
     @api.onchange("quotation_id")
     def insert_data(self):
@@ -308,16 +323,6 @@ class OptechaDrawing(models.Model):
 
     @api.multi
     def done(self):
-        # approved
-        # template = self.env["mail.template"].search([("name", "=", "Drawing Approved By Drawing Team")])
-        # local_context = self.env.context.copy()
-        # local_context.update({"revision_no": self.revision_version,
-        #                       "drawing_team_member": self.env.user.name,
-        #                       "opportunity_name": self.opportunity_id.name})
-        # lead_designer_id = self.env['res.groups'].search([('name', '=', 'Contractor')]).id
-        # users = self.env["res.users"].search([("groups_id", "=", lead_designer_id)])
-        # for user in users:
-        #     template.with_context(local_context).send_mail(user.id, force_send=True)
         self.write({'state': 'done'
                     })
 
@@ -370,11 +375,11 @@ class OptechaDrawing(models.Model):
             'context': ctx,
         }
 
-    def get_share_url(self):
-        self.ensure_one()
+    def get_share_url(self, id=None):
+        # self.ensure_one()
         params = {
             'model': self._name,
-            'res_id': self.id,
+            'res_id': id if id else self.id
         }
         if hasattr(self, 'access_token') and self.access_token:
             params['access_token'] = self.access_token

@@ -87,5 +87,54 @@
         <!--     <field name="value">40</field> -->
         <!--   </record> -->
         <!--  -->
+        <record id="view_crm_case_design_filter" model="ir.ui.view">
+            <field name="name">optecha.design.search.opportunity</field>
+            <field name="model">optecha.design</field>
+            <field name="arch" type="xml">
+                <search string="Search Design">
+                    <separator/>
+                    <filter string="Design in Progress" name="in_progress"
+                            domain="[('state', '=', 'in_progress')]"
+                            help="Opportunities that are assigned to me"/>
+                    <separator/>
+                    <filter string="Design Team Review" name="team_review"
+                            domain="[('state', '=', 'team_review')]"
+                            help="Opportunities that are assigned to me"/>
+                    <separator/>
+                    <filter string="Customer Review" name="customer_review"
+                            domain="[('state', '=', 'customer_review')]"
+                            help="Opportunities that are assigned to me"/>
+                    <separator/>
+                    <filter string="Design Done" name="done"
+                            domain="[('state', '=', 'done')]"
+                            help="Opportunities that are assigned to me"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_crm_case_drawing_filter" model="ir.ui.view">
+            <field name="name">optecha.drawing.search.opportunity</field>
+            <field name="model">optecha.drawing</field>
+            <field name="arch" type="xml">
+                <search string="Search Drawing">
+                    <separator/>
+                    <filter string="Prepare Approval Drawing Package" name="in_progress"
+                            domain="[('state', '=', 'in_progress')]"
+                            help="Prepare Approval Drawing Package"/>
+                    <separator/>
+                    <filter string="Optecha Review Approval Drawing Package" name="team_review"
+                            domain="[('state', '=', 'team_review')]"
+                            help="Optecha Review Approval Drawing Package"/>
+                    <separator/>
+                    <filter string="Contractor/Engineer Review Approval Drawing Package" name="customer_review"
+                            domain="[('state', '=', 'engineer_review')]"
+                            help="Contractor/Engineer Review Approval Drawing Package"/>
+                    <separator/>
+                    <filter string="Design Done" name="done"
+                            domain="[('state', '=', 'done')]"
+                            help="Done"/>
+                </search>
+            </field>
+        </record>
     </data>
 </odoo>

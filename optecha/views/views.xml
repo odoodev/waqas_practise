@@ -1,472 +1,363 @@
 <odoo>
     <data>
-    <record id="sale_action_quotations_new_distribution" model="ir.actions.act_window">
-        <field name="name">Quotation</field>
-        <field name="res_model">sale.order</field>
-        <field name="view_mode">form,tree,graph</field>
-        <field name="domain">[('opportunity_id', '=', active_id)]</field>
-        <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id}</field>
-    </record>
-    <record id="purchase_action_quotations_new_distribution" model="ir.actions.act_window">
-        <field name="name">Quotation</field>
-        <field name="res_model">purchase.order</field>
-        <field name="view_mode">form,tree,graph</field>
-        <field name="domain">[('opportunity_id', '=', active_id)]</field>
-        <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id}</field>
-    </record>
-    <record model="ir.ui.view" id="lead_form_inherit">
-        <field name="name">lead.form.inherit</field>
-        <field name="model">crm.lead</field>
-        <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
-        <field name="arch" type="xml">
-            <field name="date_deadline" position="after">
-                <field name="distributor_active"/>
-                <field name="distributor_id" attrs="{'invisible':[('distributor_active','=',False)]}"/>
+        <record id="sale_action_quotations_new_distribution" model="ir.actions.act_window">
+            <field name="name">Quotation</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">form,tree,graph</field>
+            <field name="domain">[('opportunity_id', '=', active_id)]</field>
+            <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id}</field>
+        </record>
+
+        <record id="purchase_action_quotations_new_distribution" model="ir.actions.act_window">
+            <field name="name">Quotation</field>
+            <field name="res_model">purchase.order</field>
+            <field name="view_mode">form,tree,graph</field>
+            <field name="domain">[('opportunity_id', '=', active_id)]</field>
+            <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id}</field>
+        </record>
+
+        <record model="ir.ui.view" id="lead_form_inherit">
+            <field name="name">lead.form.inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+                <field name="date_deadline" position="after">
+                    <field name="distributor_active"/>
+                    <field name="distributor_id" attrs="{'invisible':[('distributor_active','=',False)]}"/>
+                </field>
+                <xpath expr="//button[@name='action_set_won']" position="after">
+                    <button string="Distributor Quote" name="%(sale_action_quotations_new_distribution)d" type="action" class="oe_highlight"
+                        context="{'search_default_partner_id': distributor_id,
+                                  'default_partner_id': distributor_id,
+                                  'default_team_id': team_id,
+                                  'default_campaign_id': campaign_id,
+                                  'default_medium_id': medium_id,
+                                  'default_source_id': source_id}"
+                    attrs="{'invisible':[('distributor_active','=',False)]}"/>
+                    <button string="P.O QUOTE" name="%(purchase_action_quotations_new_distribution)d" type="action" class="oe_highlight"
+                        context="{'search_default_partner_id': distributor_id,
+                                  'default_partner_id': distributor_id,
+                                  'default_team_id': team_id,
+                                  'default_campaign_id': campaign_id,
+                                  'default_medium_id': medium_id,
+                                  'default_source_id': source_id}"/>
+                </xpath>
+
+
+                <notebook position="inside">
+                    <page name="design" string="Design">
+                        <group>
+                            <field name="design_id"/>
+                        </group>
+                    </page>
+                    <page name="Quotation" string="Quotation">
+                        <group>
+                            <field name="quotation_id"/>
+                        </group>
+                    </page>
+                    <page name="drawing" string="Approval Drawing">
+                        <group>
+                            <field name="drawing_id"/>
+                        </group>
+                    </page>
+                    <page name="purchase" string="PO">
+                        <group>
+                            <field name="po_order"/>
+                        </group>
+                    </page>
+                    <!--<page name="design_fees" string="Design Fees"
+                          attrs="{'invisible':[('distributor_active','=',False)]}">
+                        <group>
+                            <field name="quotation_fees_id"/>
+                        </group>
+                    </page>-->
+                </notebook>
             </field>
-            <xpath expr="//button[@name='action_set_won']" position="after">
-                <button string="Distributor Quote" name="%(sale_action_quotations_new_distribution)d" type="action" class="oe_highlight"
-                    context="{'search_default_partner_id': distributor_id,
-                              'default_partner_id': distributor_id,
-                              'default_team_id': team_id,
-                              'default_campaign_id': campaign_id,
-                              'default_medium_id': medium_id,
-                              'default_source_id': source_id}"
-                attrs="{'invisible':[('distributor_active','=',False)]}"/>
-                <button string="P.O QUOTE" name="%(purchase_action_quotations_new_distribution)d" type="action" class="oe_highlight"
-                    context="{'search_default_partner_id': distributor_id,
-                              'default_partner_id': distributor_id,
-                              'default_team_id': team_id,
-                              'default_campaign_id': campaign_id,
-                              'default_medium_id': medium_id,
-                              'default_source_id': source_id}"/>
-            </xpath>
+        </record>
 
+        <record model="ir.ui.view" id="product_form_inherit">
+            <field name="name">product.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
 
-            <notebook position="inside">
-                <page name="design" string="Design">
+            <field name="arch" type="xml">
+                <page position="inside">
                     <group>
-                        <field name="design_id"/>
+                        <field name="application"/>
+                        <field name="optecha_direct"/>
+                        <field name="catalogue_number"/>
+                        <field name="product_category"/>
+                        <field name="mounting"/>
+                        <field name="size"/>
+                        <field name="optic_distribution"/>
+                        <field name="optic_finish_option"/>
+                        <field name="color_temperature"/>
+                        <field name="normal_lumens_output"/>
+                        <field name="dimming"/>
+                        <field name="wattage"/>
+                        <field name="voltage"/>
+                        <field name="color_finish"/>
+                        <field name="list_of_options"/>
                     </group>
                 </page>
-                <page name="Quotation" string="Quotation">
-                    <group>
-                        <field name="quotation_id"/>
-                    </group>
-                </page>
-                <page name="drawing" string="Approval Drawing">
-                    <group>
-                        <field name="drawing_id"/>
-                    </group>
-                </page>
-                <page name="purchase" string="PO">
-                    <group>
-                        <field name="po_order"/>
-                    </group>
-                </page>
-                <!--<page name="design_fees" string="Design Fees"
-                      attrs="{'invisible':[('distributor_active','=',False)]}">
-                    <group>
-                        <field name="quotation_fees_id"/>
-                    </group>
-                </page>-->
-            </notebook>
-        </field>
-    </record>
-
-    <record model="ir.ui.view" id="product_form_inherit">
-        <field name="name">product.form.inherit</field>
-        <field name="model">product.template</field>
-        <field name="inherit_id" ref="product.product_template_only_form_view"/>
-
-        <field name="arch" type="xml">
-            <page position="inside">
-                <group>
-                    <field name="application"/>
-                    <field name="optecha_direct"/>
-                    <field name="catalogue_number"/>
-                    <field name="product_category"/>
-                    <field name="mounting"/>
-                    <field name="size"/>
-                    <field name="optic_distribution"/>
-                    <field name="optic_finish_option"/>
-                    <field name="color_temperature"/>
-                    <field name="normal_lumens_output"/>
-                    <field name="dimming"/>
-                    <field name="wattage"/>
-                    <field name="voltage"/>
-                    <field name="color_finish"/>
-                    <field name="list_of_options"/>
-                </group>
-            </page>
-            <!--<xpath expr='//page[name="general_information"]' position="inside">-->
-            <!--<field name="check">haider</field>-->
-            <!--</xpath>-->
-        </field>
-    </record>
-
-    <record model="ir.ui.view" id="Quotation_form_inherit">
-        <field name="name">quotation.form.inherit</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
-        <field name="arch" type="xml">
-            <field name="partner_id" position="after">
-                <field name="select_design" domain="[('opportunity_id', '=', opportunity_id)]"/>
-                <field name="project_name"/>
-                <field name="project_location"/>
-                <field name="project_completion_date"/>
+                <!--<xpath expr='//page[name="general_information"]' position="inside">-->
+                <!--<field name="check">haider</field>-->
+                <!--</xpath>-->
             </field>
-        </field>
-    </record>
+        </record>
 
-    <record model="ir.ui.view" id="optecha_design_form">
-        <field name="name">Statusbar</field>
-        <field name="model">optecha.design</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-            <form string="Workflow record">
-                <!--The header tag is built to add buttons within. This puts them at the top-->
-                <header>
-                    <button string="Send to Team Review" type="object"
-                            name="team_review" attrs="{'invisible': [('state', '!=', 'in_progress')]}"/>
-
-                    <button string="Approve" type="object"
-                            name="customer_review"
-                            attrs="{'invisible': [('state','!=','team_review')]}"/>
-
-                    <button string="Reject" type="object"
-                            name="reject_reset"
-                            attrs="{'invisible': [('state','!=','team_review')]}"/>
-
-                    <button string="Approved" type="object"
-                            name="done"
-                            attrs="{'invisible': [('state','!=','customer_review')]}"/>
-
-                    <button string="Rejected" type="object"
-                            name="reset_by_customer"
-                            attrs="{'invisible': [('state','!=','customer_review')]}"/>
-
-                    <button string="Reset" type="object"
-                            name="reset" attrs="{'invisible': [('state', '!=', 'done')]}"/>
-                    <button name="action_quotation_send" string="Send by Email" type="object"
-                            attrs="{'invisible': [('state','!=','customer_review')]}" class="btn-primary"
-                     context="{'design_file': True}"/>
-
-                         <!--This will create the statusbar, thanks to the widget. -->
-                    <field name="state" widget="statusbar"/>
-                </header>
-                <group>
-                    <field name="name"/>
+        <record model="ir.ui.view" id="Quotation_form_inherit">
+            <field name="name">quotation.form.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="select_design" domain="[('opportunity_id', '=', opportunity_id)]"/>
                     <field name="project_name"/>
                     <field name="project_location"/>
                     <field name="project_completion_date"/>
-                    <field name="revision_version"/>
-                    <field name="status"/>
-                    <field name="opportunity_id"/>
-                    <field name="designer_id"/>
-                    <field name="architect_id"/>
-                    <field name="design_file" filename="my_file_fname" widget="many2many_binary"/>
-                </group>
-            </form>
-        </field>
-    </record>
-
-    <record model="ir.ui.view" id="optecha_design_list">
-        <field name="name">Optecha</field>
-        <field name="model">optecha.design</field>
-        <field name="priority" eval="16"/>
-        <field name="arch" type="xml">
-            <tree string="tree view">
-                <field name="name"/>
-                <field name="project_location"/>
-                <field name="opportunity_id"/>
-                <field name="designer_id"/>
-                <field name="revision_version" />
-                <field name="state"/>
-            </tree>
-        </field>
-    </record>
-
-    <record model="ir.ui.view" id="optecha_design_graph">
-
-            <field name="name">optecha.design.graph</field>
-            <field name="model">optecha.design</field>
-            <field name="arch" type="xml">
-                <graph string="Opportunities" type="bar">
-                    <field name="name" type="row"/>
-                    <field name="no_of_days" type="measure"/>
-                </graph>
+                </field>
             </field>
-    </record>
+        </record>
 
-    <record model="ir.actions.act_window" id="optecha_design_action">
-        <field name="name">Design</field>
-        <field name="res_model">optecha.design</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form,graph</field>
-        <!--<field name='view_id' ref='view_statusbar_form'/>-->
-    </record>
-
-        <menuitem id="menu_optecha_design"
-                  name="Desgin"
-                  action="optecha_design_action" parent="crm.crm_menu_pipeline"
-                  sequence="50"/>
-
-        <!--Drawing-->
-
-        <record model="ir.ui.view" id="optecha_drawing_form">
-            <field name="name">optecha.drawing.form</field>
-            <field name="model">optecha.drawing</field>
+        <record model="ir.ui.view" id="optecha_design_form">
+            <field name="name">Statusbar</field>
+            <field name="model">optecha.design</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Workflow record">
+                    <!--The header tag is built to add buttons within. This puts them at the top-->
                     <header>
                         <button string="Send to Team Review" type="object"
-                                name="team_review" attrs="{'invisible': [('state', '!=', 'in_progress'),]}"/>
+                                name="team_review" attrs="{'invisible': [('state', '!=', 'in_progress')]}"/>
 
                         <button string="Approve" type="object"
-                                name="engineer_review"
+                                name="customer_review"
                                 attrs="{'invisible': [('state','!=','team_review')]}"/>
 
                         <button string="Reject" type="object"
-                                name="team_reject"
+                                name="reject_reset"
                                 attrs="{'invisible': [('state','!=','team_review')]}"/>
 
                         <button string="Approved" type="object"
                                 name="done"
-                                attrs="{'invisible': [('state','!=','engineer_review')]}"/>
+                                attrs="{'invisible': [('state','!=','customer_review')]}"/>
 
                         <button string="Rejected" type="object"
-                                name="rejected_by_contractor" attrs="{'invisible': [('state', '!=', 'engineer_review'),]}"/>
+                                name="reset_by_customer"
+                                attrs="{'invisible': [('state','!=','customer_review')]}"/>
 
                         <button string="Reset" type="object"
-                                name="reset"
-                                attrs="{'invisible': [('state', '!=', 'done'),]}"/>
-
-                        <button string="Out To Date" type="object"
-                                name="out_to_date"
-                                attrs="{'invisible': [('state', '!=', 'done'),]}"/>
-
-                        <button string="Back To Done" type="object"
-                                name="back_to_done"
-                                attrs="{'invisible': [('state', '!=', 'out_to_date'),]}"/>
-
+                                name="reset" attrs="{'invisible': [('state', '!=', 'done')]}"/>
                         <button name="action_quotation_send" string="Send by Email" type="object"
-                                attrs="{'invisible': [('state','!=','engineer_review')]}" class="btn-primary"
-                         />
+                                attrs="{'invisible': [('state','!=','customer_review')]}" class="btn-primary"
+                         context="{'design_file': True}"/>
 
-                        <!--<button string="Reset" type="object"-->
-                        <!--name="reset" attrs="{'invisible': [('state', '!=', 'customer_approved')]}"/>-->
-
+                             <!--This will create the statusbar, thanks to the widget. -->
                         <field name="state" widget="statusbar"/>
                     </header>
                     <group>
                         <field name="name"/>
-                        <field name="opportunity_id"/>
-                        <field name="quotation_id" domain="[('opportunity_id', '=', opportunity_id)]"/>
                         <field name="project_name"/>
+                        <field name="project_location"/>
+                        <field name="project_completion_date"/>
                         <field name="revision_version"/>
-                        <field name="version"/>
-                        <field name="contractor_id" string="Contractor/Engineer"/>
-                        <field name="assign_to" string="Assign to"/>
+                        <field name="status"/>
+                        <field name="opportunity_id"/>
+                        <field name="designer_id"/>
+                        <field name="architect_id"/>
                         <field name="design_file" filename="my_file_fname" widget="many2many_binary"/>
-                        <field name="comment" widget="html" attrs="{'invisible': [('state','!=','team_review')]}" />
-
-
                     </group>
                 </form>
             </field>
         </record>
 
-        <record model="ir.ui.view" id="optecha_drawing_list">
-            <field name="name">optecha.drawing.list</field>
-            <field name="model">optecha.drawing</field>
+        <record model="ir.ui.view" id="optecha_design_list">
+            <field name="name">Optecha</field>
+            <field name="model">optecha.design</field>
             <field name="priority" eval="16"/>
             <field name="arch" type="xml">
                 <tree string="tree view">
                     <field name="name"/>
+                    <field name="project_location"/>
                     <field name="opportunity_id"/>
-                    <field name="version"/>
+                    <field name="designer_id"/>
+                    <field name="revision_version" />
                     <field name="state"/>
                 </tree>
             </field>
         </record>
 
-        <record model="ir.actions.act_window" id="optecha_drawing_action">
-            <field name="name">Approval Drawing</field>
-            <field name="res_model">optecha.drawing</field>
+        <record model="ir.ui.view" id="optecha_design_graph">
+
+                <field name="name">optecha.design.graph</field>
+                <field name="model">optecha.design</field>
+                <field name="arch" type="xml">
+                    <graph string="Opportunities" type="bar">
+                        <field name="name" type="row"/>
+                        <field name="no_of_days" type="measure"/>
+                    </graph>
+                </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="optecha_design_action">
+            <field name="name">Design</field>
+            <field name="res_model">optecha.design</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,graph</field>
             <!--<field name='view_id' ref='view_statusbar_form'/>-->
         </record>
 
+        <menuitem id="menu_optecha_design"
+                      name="Desgin"
+                      action="optecha_design_action" parent="crm.crm_menu_pipeline"
+                      sequence="50"/>
+
+        <!--Drawing-->
+
+        <record model="ir.ui.view" id="optecha_drawing_form">
+                <field name="name">optecha.drawing.form</field>
+                <field name="model">optecha.drawing</field>
+                <field name="type">form</field>
+                <field name="arch" type="xml">
+                    <form string="Workflow record">
+                        <header>
+                            <button string="Send to Team Review" type="object"
+                                    name="team_review" attrs="{'invisible': [('state', '!=', 'in_progress'),]}"/>
+
+                            <button string="Approve" type="object"
+                                    name="engineer_review"
+                                    attrs="{'invisible': [('state','!=','team_review')]}"/>
+
+                            <button string="Reject" type="object"
+                                    name="team_reject"
+                                    attrs="{'invisible': [('state','!=','team_review')]}"/>
+
+                            <button string="Approved" type="object"
+                                    name="done"
+                                    attrs="{'invisible': [('state','!=','engineer_review')]}"/>
+
+                            <button string="Rejected" type="object"
+                                    name="rejected_by_contractor" attrs="{'invisible': [('state', '!=', 'engineer_review'),]}"/>
+
+                            <button string="Reset" type="object"
+                                    name="reset"
+                                    attrs="{'invisible': [('state', '!=', 'done'),]}"/>
+
+                            <button string="Out To Date" type="object"
+                                    name="out_to_date"
+                                    attrs="{'invisible': [('state', '!=', 'done'),]}"/>
+
+                            <button string="Back To Done" type="object"
+                                    name="back_to_done"
+                                    attrs="{'invisible': [('state', '!=', 'out_to_date'),]}"/>
+
+                            <button name="action_quotation_send" string="Send by Email" type="object"
+                                    attrs="{'invisible': [('state','!=','engineer_review')]}" class="btn-primary"
+                             />
+
+                            <!--<button string="Reset" type="object"-->
+                            <!--name="reset" attrs="{'invisible': [('state', '!=', 'customer_approved')]}"/>-->
+
+                            <field name="state" widget="statusbar"/>
+                        </header>
+                        <group>
+                            <field name="name"/>
+                            <field name="opportunity_id"/>
+                            <field name="quotation_id" domain="[('opportunity_id', '=', opportunity_id)]"/>
+                            <field name="project_name"/>
+                            <field name="revision_version"/>
+                            <field name="version"/>
+                            <field name="contractor_id" string="Contractor/Engineer"/>
+                            <field name="assign_to" string="Assign to"/>
+                            <field name="design_file" filename="my_file_fname" widget="many2many_binary"/>
+                            <field name="comment" widget="html" attrs="{'invisible': [('state','!=','team_review')]}" />
+
+
+                        </group>
+                    </form>
+                </field>
+            </record>
+
+        <record model="ir.ui.view" id="optecha_drawing_list">
+                <field name="name">optecha.drawing.list</field>
+                <field name="model">optecha.drawing</field>
+                <field name="priority" eval="16"/>
+                <field name="arch" type="xml">
+                    <tree string="tree view">
+                        <field name="name"/>
+                        <field name="opportunity_id"/>
+                        <field name="version"/>
+                        <field name="state"/>
+                    </tree>
+                </field>
+            </record>
+
+        <record model="ir.actions.act_window" id="optecha_drawing_action">
+                <field name="name">Approval Drawing</field>
+                <field name="res_model">optecha.drawing</field>
+                <field name="view_type">form</field>
+                <field name="view_mode">tree,form</field>
+                <!--<field name='view_id' ref='view_statusbar_form'/>-->
+            </record>
+
         <menuitem id="menu_optecha_drawing" name="Approval Drawing" action="optecha_drawing_action"
-                  parent="crm.crm_menu_pipeline" sequence="60"/>
+                      parent="crm.crm_menu_pipeline" sequence="60"/>
 
-        <!-- explicit list view definition -->
-        <!--
-        <record model="ir.ui.view" id="optecha.list">
-            <field name="name">optecha list</field>
-            <field name="model">optecha.optecha</field>
-            <field name="arch" type="xml">
-        <tree>
-             <field name="name"/>
-             <field name="value"/>
-             <field name="value2"/>
-        </tree>
-        </field>
-    </record>
-    -->
-
-        <!-- actions opening views on models -->
-        <!--
-    <record model="ir.actions.act_window" id="optecha.action_window">
-      <field name="name">optecha window</field>
-      <field name="res_model">optecha.optecha</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-    -->
-
-        <!-- server action to the one above -->
-        <!--
-    <record model="ir.actions.server" id="optecha.action_server">
-      <field name="name">optecha server</field>
-      <field name="model_id" ref="model_optecha_optecha"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": self._name,
-        }
-      </field>
-    </record>
-    -->
-
-        <!-- Top menu item -->
-        <!--
-    <menuitem name="optecha" id="optecha.menu_root"/>
-    -->
-        <!-- menu categories -->
-        <!--
-    <menuitem name="Menu 1" id="optecha.menu_1" parent="optecha.menu_root"/>
-    <menuitem name="Menu 2" id="optecha.menu_2" parent="optecha.menu_root"/>
-    -->
-        <!-- actions -->
-        <!--
-    <menuitem name="List" id="optecha.menu_1_list" parent="optecha.menu_1"
-              action="optecha.action_window"/>
-    <menuitem name="Server to list" id="optecha" parent="optecha.menu_2"
-              action="optecha.action_server"/>
-    -->
 
         <record id="optecha_inherit_sale_order_line" model="ir.ui.view">
-            <field name="name">optecha inherit sale order line</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//sheet/notebook/page/field/form/group/group/field[@name='product_id']" position="after">
-                    <field name="optecha_type"/>
-                </xpath>
-<!--
-                <field name="partner_id" position="after">
-                    <field name="dis_id" widget="many2many_tags"/>
-                </field>
--->
+                <field name="name">optecha inherit sale order line</field>
+                <field name="model">sale.order</field>
+                <field name="inherit_id" ref="sale.view_order_form"/>
+                <field name="arch" type="xml">
+                    <xpath expr="//sheet/notebook/page/field/form/group/group/field[@name='product_id']" position="after">
+                        <field name="optecha_type"/>
+                    </xpath>
 
-                <xpath expr="//sheet/notebook/page/field/tree/field[@name='product_id']" position="after">
-                    <field name="optecha_type"/>
-                </xpath>
-            </field>
-        </record>
+                    <xpath expr="//sheet/notebook/page/field/tree/field[@name='product_id']" position="after">
+                        <field name="optecha_type"/>
+                    </xpath>
+                </field>
+            </record>
 
         <!--     Roles Defined   -->
         <record model="ir.module.category" id="category_optecha_management">
-            <field name="name">Optecha</field>
-            <field name="description">Optecha Management</field>
-            <field name="sequence">21</field>
-        </record>
-        <!--<record id="optecha_technical_support_analysis_group" model="res.groups">-->
-            <!--<field name="name">Technical Support Analyst</field>-->
-            <!--<field name="comment">Technical Support Analyst Group.</field>-->
-            <!--<field name="category_id" ref="category_optecha_management"/>-->
-        <!--</record>-->
-        <!--<record id="optecha_director_group" model="res.groups">-->
-            <!--<field name="name">Director</field>-->
-            <!--<field name="comment">Director Group.</field>-->
-            <!--<field name="implied_ids" eval="[(4, ref('optecha_technical_support_analysis_group'))]" />-->
-            <!--<field name="category_id" ref="category_optecha_management"/>-->
-        <!--</record>-->
-        <!--<record id="optecha_operations_manager_group" model="res.groups">-->
-            <!--<field name="name">Operation Manager</field>-->
-            <!--<field name="comment">Operation Manager Group.</field>-->
-            <!--<field name="implied_ids" eval="[(4, ref('optecha_director_group'))]" />-->
-            <!--<field name="category_id" ref="category_optecha_management"/>-->
-        <!--</record>-->
-        <!--<record id="optecha_lead_designer_group" model="res.groups">-->
-            <!--<field name="name">Lead Designer</field>-->
-            <!--<field name="comment">Lead Designer Group.</field>-->
-            <!--<field name="implied_ids" eval="[(4, ref('optecha_operations_manager_group'))]" />-->
-            <!--<field name="category_id" ref="category_optecha_management"/>-->
-        <!--</record>-->
-        <!--<record id="optecha_design_team_member_group" model="res.groups">-->
-            <!--<field name="name">Design Team Member</field>-->
-            <!--<field name="comment">Design Team Member Group.</field>-->
-            <!--<field name="implied_ids" eval="[(4, ref('optecha_lead_designer_group'))]" />-->
-            <!--<field name="category_id" ref="category_optecha_management"/>-->
-        <!--</record>-->
-        <!--<record id="optecha_quote_team_member_group" model="res.groups">-->
-            <!--<field name="name">Quote Team Member</field>-->
-            <!--<field name="comment">Quote Team Member Group.</field>-->
-            <!--<field name="implied_ids" eval="[(4, ref('optecha_design_team_member_group'))]" />-->
-            <!--<field name="category_id" ref="category_optecha_management"/>-->
-        <!--</record>-->
-        <!--<record id="optecha_drawing_team_member_group" model="res.groups">-->
-            <!--<field name="name">Drawing Team Member</field>-->
-            <!--<field name="comment">Drawing Team Member Group.</field>-->
-            <!--<field name="implied_ids" eval="[(4, ref('optecha_quote_team_member_group'))]" />-->
-            <!--<field name="category_id" ref="category_optecha_management"/>-->
-        <!--</record>-->
-        <!--<record id="optecha_contractor_team_member_group" model="res.groups">-->
-            <!--<field name="name">Contractor Team Member</field>-->
-            <!--<field name="comment">Contractor Team Member Group.</field>-->
-            <!--<field name="implied_ids" eval="[(4, ref('optecha_drawing_team_member_group'))]" />-->
-            <!--<field name="category_id" ref="category_optecha_management"/>-->
-        <!--</record>-->
-        <!--<record id="optecha_administrative_specialist_group" model="res.groups">-->
-            <!--<field name="name">Administrative Specialist</field>-->
-            <!--<field name="comment">Administrative Specialist Group.</field>-->
-            <!--<field name="implied_ids" eval="[(4, ref('optecha_contractor_team_member_group'))]" />-->
-            <!--<field name="category_id" ref="category_optecha_management"/>-->
-        <!--</record>-->
+                <field name="name">Optecha</field>
+                <field name="description">Optecha Management</field>
+                <field name="sequence">21</field>
+            </record>
+
         <record model="ir.ui.view" id="Quotation_form_purchase_inherit">
-            <field name="name">quotation.form.inherit</field>
-            <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="purchase.purchase_order_form"/>
-            <field name="arch" type="xml">
-                <field name="date_approve" position="after">
-                    <field name="opportunity_id"/>
+                <field name="name">quotation.form.inherit</field>
+                <field name="model">purchase.order</field>
+                <field name="inherit_id" ref="purchase.purchase_order_form"/>
+                <field name="arch" type="xml">
+                    <field name="date_approve" position="after">
+                        <field name="opportunity_id"/>
+                    </field>
                 </field>
-            </field>
-        </record>
+            </record>
+
         <record model="ir.ui.view" id="Quotation_form_purchase_inherit">
-            <field name="name">quotation.form.inherit</field>
-            <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="purchase.purchase_order_tree"/>
-            <field name="arch" type="xml">
-                <field name="state" position="after">
-                    <field name="dis_id" widget="many2many_tags"/>
+                <field name="name">quotation.form.inherit</field>
+                <field name="model">purchase.order</field>
+                <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+                <field name="arch" type="xml">
+                    <field name="state" position="after">
+                        <field name="dis_id" widget="many2many_tags"/>
+                    </field>
                 </field>
-            </field>
-        </record>
+            </record>
+
         <record model="ir.ui.view" id="Quotation_form_sale_tree_inherit">
-            <field name="name">quotation.tree.inherit</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_tree"/>
-            <field name="arch" type="xml">
-                <field name="state" position="after">
-                    <field name="dis_id" widget="many2many_tags"/>
+                <field name="name">quotation.tree.inherit</field>
+                <field name="model">sale.order</field>
+                <field name="inherit_id" ref="sale.view_order_tree"/>
+                <field name="arch" type="xml">
+                    <field name="state" position="after">
+                        <field name="dis_id" widget="many2many_tags"/>
+                    </field>
                 </field>
-            </field>
         </record>
 
     </data>
