@@ -127,7 +127,6 @@
             <field name="name">Statusbar</field>
             <field name="model">optecha.design</field>
             <field name="type">form</field>
-            <!--<field name="context">{'default_opportunity_id': context.get('opportunity_id', False),}</field>-->
             <field name="arch" type="xml">
                 <form string="Workflow record">
                     <!--The header tag is built to add buttons within. This puts them at the top-->
