@@ -47,7 +47,7 @@
                 <notebook position="inside">
                     <page name="design" string="Design">
                         <group>
-                            <field name="design_id"/>
+                            <field name="design_id" context="{'default_opportunity_id': active_id}"/>
                         </group>
                     </page>
                     <page name="Quotation" string="Quotation">
@@ -57,7 +57,7 @@
                     </page>
                     <page name="drawing" string="Approval Drawing">
                         <group>
-                            <field name="drawing_id"/>
+                            <field name="drawing_id" context="{'default_opportunity_id': active_id}" />
                         </group>
                     </page>
                     <page name="purchase" string="PO">
@@ -112,10 +112,13 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
                 <field name="partner_id" position="after">
+                    <field name="opportunity_id"/>
                     <field name="select_design" domain="[('opportunity_id', '=', opportunity_id)]"/>
+                  
                     <field name="project_name"/>
                     <field name="project_location"/>
                     <field name="project_completion_date"/>
+
                 </field>
             </field>
         </record>
@@ -124,6 +127,7 @@
             <field name="name">Statusbar</field>
             <field name="model">optecha.design</field>
             <field name="type">form</field>
+            <!--<field name="context">{'default_opportunity_id': context.get('opportunity_id', False),}</field>-->
             <field name="arch" type="xml">
                 <form string="Workflow record">
                     <!--The header tag is built to add buttons within. This puts them at the top-->
@@ -149,6 +153,16 @@
 
                         <button string="Reset" type="object"
                                 name="reset" attrs="{'invisible': [('state', '!=', 'done')]}"/>
+
+                        <button string="Out Of Date" type="object"
+                                    name="out_to_date"
+                                    attrs="{'invisible': [('state', '!=', 'done'),]}"/>
+
+                        <button string="Back To Done" type="object"
+                                    name="back_to_done"
+                                    attrs="{'invisible': [('state', '!=', 'out_to_date'),]}"/>
+
+
                         <button name="action_quotation_send" string="Send by Email" type="object"
                                 attrs="{'invisible': [('state','!=','customer_review')]}" class="btn-primary"
                          context="{'design_file': True}"/>
@@ -163,10 +177,11 @@
                         <field name="project_completion_date"/>
                         <field name="revision_version"/>
                         <field name="status"/>
-                        <field name="opportunity_id"/>
+                        <field name="opportunity_id" />
                         <field name="designer_id"/>
                         <field name="architect_id"/>
                         <field name="design_file" filename="my_file_fname" widget="many2many_binary"/>
+                        <field name="comment" widget="html" attrs="{'invisible': [('state','!=','team_review')]}" />
                     </group>
                 </form>
             </field>
@@ -208,6 +223,18 @@
             <!--<field name='view_id' ref='view_statusbar_form'/>-->
         </record>
 
+        <record model="ir.ui.view" id="optecha_drawing_graph">
+
+                <field name="name">optecha.drawing.graph</field>
+                <field name="model">optecha.drawing</field>
+                <field name="arch" type="xml">
+                    <graph string="Report" type="bar">
+                        <field name="name" type="row"/>
+                        <field name="no_of_days" type="measure"/>
+                    </graph>
+                </field>
+        </record>
+
         <menuitem id="menu_optecha_design"
                       name="Desgin"
                       action="optecha_design_action" parent="crm.crm_menu_pipeline"
@@ -244,7 +271,7 @@
                                     name="reset"
                                     attrs="{'invisible': [('state', '!=', 'done'),]}"/>
 
-                            <button string="Out To Date" type="object"
+                            <button string="Out Of Date" type="object"
                                     name="out_to_date"
                                     attrs="{'invisible': [('state', '!=', 'done'),]}"/>
 
@@ -297,7 +324,7 @@
                 <field name="name">Approval Drawing</field>
                 <field name="res_model">optecha.drawing</field>
                 <field name="view_type">form</field>
-                <field name="view_mode">tree,form</field>
+                <field name="view_mode">tree,form,graph</field>
                 <!--<field name='view_id' ref='view_statusbar_form'/>-->
             </record>
 

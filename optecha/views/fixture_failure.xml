@@ -86,8 +86,8 @@
             </field>
         </record>
 
-         <menuitem id="menu_optecha_fixture_failure" name="Fixture Failure" action="optecha_fixture_failure"
-                  parent="crm.crm_menu_pipeline" sequence="70"/>
+         <!--<menuitem id="menu_optecha_fixture_failure" name="Fixture Failure" action="optecha_fixture_failure"-->
+                  <!--parent="crm.crm_menu_pipeline" sequence="70"/>-->
 
 
     </data>

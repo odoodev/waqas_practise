@@ -30,7 +30,7 @@
 
         <record model="crm.stage" id="stage_lead12">
             <field name="name">Won</field>
-            <field name="probability">40</field>
+            <field name="probability">100</field>
             <field name="on_change">1</field>
             <field name="sequence">74</field>
         </record>
@@ -92,6 +92,9 @@
             <field name="model">optecha.design</field>
             <field name="arch" type="xml">
                 <search string="Search Design">
+
+                    <field name="name"/>
+                    <field name="project_name" />
                     <separator/>
                     <filter string="Design in Progress" name="in_progress"
                             domain="[('state', '=', 'in_progress')]"
@@ -117,6 +120,9 @@
             <field name="model">optecha.drawing</field>
             <field name="arch" type="xml">
                 <search string="Search Drawing">
+
+                    <field name="name"/>
+
                     <separator/>
                     <filter string="Prepare Approval Drawing Package" name="in_progress"
                             domain="[('state', '=', 'in_progress')]"
