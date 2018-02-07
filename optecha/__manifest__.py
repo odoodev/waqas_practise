@@ -27,7 +27,7 @@
         'demo/demo.xml',
         'security/ir.model.access.csv',
         'views/views.xml',
-        'views/fixture_failure.xml',
+        'views/rma.xml',
         'report/optecha_report.xml',
         'report/optecha_sale_report_temp.xml',
         'data/designer_template.xml',

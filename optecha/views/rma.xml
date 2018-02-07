@@ -1,0 +1,80 @@
+<odoo>
+  <data>
+
+
+    <record model="ir.ui.view" id="optecha_rma_form">
+            <field name="name">rma_form_view</field>
+            <field name="model">optecha.rma</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Workflow record">
+                    <!--The header tag is built to add buttons within. This puts them at the top-->
+                    <header>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="opportunity_id"/>
+                            <field name="orders"/>
+                            <field name="order_lines"/>
+
+                        </group>
+                        <group>
+                            <field name="reason"/>
+                            <field name="partner_id"/>
+                            <field name="product_id"/>
+                        </group>
+
+                    </group>
+
+                </form>
+            </field>
+        </record>
+
+    <record model="ir.ui.view" id="optecha_rma_tree">
+            <field name="name">rma_tree_view</field>
+            <field name="model">optecha.rma</field>
+            <field name="priority" eval="16"/>
+            <field name="arch" type="xml">
+                <tree string="tree view">
+                    <field name="name"/>
+                    <field name="opportunity_id"/>
+                    <field name="orders"/>
+                    <field name="order_lines"/>
+                    <field name="reason"/>
+                    <field name="partner_id"/>
+                    <field name="product_id"/>
+                </tree>
+            </field>
+        </record>
+    <record model="ir.actions.act_window" id="rma_form_action">
+            <field name="name">Optecha RMA</field>
+            <field name="res_model">optecha.rma</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!--<field name='view_id' ref='view_statusbar_form'/>-->
+        </record>
+
+
+
+    <menuitem id="menu_optecha_rma"
+                  name="RMA"
+                  action="rma_form_action" parent="crm.crm_menu_pipeline"
+                  sequence="70"/>
+
+
+    <!--<button string="Additional Product" name="%(quotation_rma_form_action_button)d" type="action" class="oe_highlight"
+                        context="{'search_default_partner_id': distributor_id,
+                                  'default_partner_id': partner_id}"/>-->
+
+    <!--<record model="ir.actions.act_window" id="quotation_rma_form_action_button">
+            <field name="name">Optecha RMA</field>
+            <field name="res_model">optecha.rma</field>
+            <field name="view_mode">form,tree,graph</field>
+            <field name="domain">[('opportunity_id', '=', active_id)]</field>
+            <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id}</field>
+            &lt;!&ndash;<field name='view_id' ref='view_statusbar_form'/>&ndash;&gt;
+        </record>-->
+  </data>
+</odoo>
