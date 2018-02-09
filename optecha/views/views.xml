@@ -43,7 +43,6 @@
                                   'default_source_id': source_id}"/>
                 </xpath>
 
-
                 <notebook position="inside">
                     <page name="design" string="Design">
                         <group>
@@ -65,12 +64,13 @@
                             <field name="po_order"/>
                         </group>
                     </page>
-                    <!--<page name="design_fees" string="Design Fees"
-                          attrs="{'invisible':[('distributor_active','=',False)]}">
-                        <group>
-                            <field name="quotation_fees_id"/>
-                        </group>
-                    </page>-->
+                    <page name="rma" string="RMA">
+
+                    <group>
+                          <field name="rma_id" context="{'default_opportunity_id': active_id}" />
+                    </group>
+                    </page>
+
                 </notebook>
             </field>
         </record>
@@ -111,8 +111,12 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
+
+
+
+
                 <field name="partner_id" position="after">
-                    <field name="opportunity_id"/>
+                    <field name="opportunity_id" />
                     <field name="select_design" domain="[('opportunity_id', '=', opportunity_id)]"/>
                   
                     <field name="project_name"/>
@@ -120,6 +124,11 @@
                     <field name="project_completion_date"/>
 
                 </field>
+
+                <xpath expr="//group[@name='technical']//field[@name='opportunity_id']" position="replace">
+                <!--remove group="one_no in opportunity_id field"-->
+                  <field name="opportunity_id" help="Log in the chatter from which opportunity the order originates"  />
+                </xpath>
             </field>
         </record>
 
@@ -169,19 +178,41 @@
                              <!--This will create the statusbar, thanks to the widget. -->
                         <field name="state" widget="statusbar"/>
                     </header>
-                    <group>
-                        <field name="name"/>
-                        <field name="project_name"/>
-                        <field name="project_location"/>
-                        <field name="project_completion_date"/>
-                        <field name="revision_version"/>
-                        <field name="status"/>
-                        <field name="opportunity_id" />
-                        <field name="designer_id"/>
-                        <field name="architect_id"/>
-                        <field name="design_file" filename="my_file_fname" widget="many2many_binary"/>
-                        <field name="comment" widget="html" attrs="{'invisible': [('state','!=','team_review')]}" />
-                    </group>
+                    <sheet>
+                         <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+
+                            <h1><field name="name" placeholder="e.g. Design -xxx" /></h1>
+                        </div>
+
+
+                        <group>
+                            <group>
+                            <field name="opportunity_id" />
+                            <field name="project_name"/>
+                            <field name="project_location"/>
+                            <field name="project_completion_date"/>
+
+                            </group>
+                            <group>
+                            <field name="revision_version"/>
+                            <field name="status"/>
+                            <field name="designer_id"/>
+                            <field name="architect_id"/>
+
+                            </group>
+                        </group>
+                        <group>
+                            <field name="comment" widget="html" attrs="{'invisible': [('state','!=','team_review')]}" />
+                            <field name="design_file" filename="my_file_fname" widget="many2many_binary"/>
+
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>-->
+                        <field name="message_ids" widget="mail_thread" options="{'post_refresh': 'recipients'}"/>
+                     </div>
                 </form>
             </field>
         </record>
@@ -287,20 +318,40 @@
 
                             <field name="state" widget="statusbar"/>
                         </header>
+                        <sheet>
+                             <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+
+                            <h1><field name="name" placeholder="e.g. Drawing -xxx" /></h1>
+                        </div>
+
                         <group>
-                            <field name="name"/>
+
+                            <group>
                             <field name="opportunity_id"/>
                             <field name="quotation_id" domain="[('opportunity_id', '=', opportunity_id)]"/>
                             <field name="project_name"/>
-                            <field name="revision_version"/>
+                            </group>
+                            <group>                                <field name="revision_version"/>
                             <field name="version"/>
                             <field name="contractor_id" string="Contractor/Engineer"/>
                             <field name="assign_to" string="Assign to"/>
-                            <field name="design_file" filename="my_file_fname" widget="many2many_binary"/>
-                            <field name="comment" widget="html" attrs="{'invisible': [('state','!=','team_review')]}" />
 
+                            </group>
 
                         </group>
+                            <group>
+
+                              <field name="comment" widget="html" attrs="{'invisible': [('state','!=','team_review')]}" />
+                              <field name="design_file" filename="my_file_fname" widget="many2many_binary"/>
+                            </group>
+                        </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>-->
+                        <field name="message_ids" widget="mail_thread" options="{'post_refresh': 'recipients'}"/>
+                     </div>
+
                     </form>
                 </field>
             </record>

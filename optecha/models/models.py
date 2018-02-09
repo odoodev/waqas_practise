@@ -7,8 +7,9 @@ from odoo.exceptions import UserError, AccessError
 
 class OptechaDesign(models.Model):
     _name = 'optecha.design'
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'utm.mixin', 'format.address.mixin']
 
-    name = fields.Char('Design Name', required=False)
+    name = fields.Char('Design', required=False)
     project_name = fields.Char('Project Name', required=False)
     project_location = fields.Char('Project Location', required=False)
     project_completion_date = fields.Date('Expected Completion Date')
@@ -234,7 +235,9 @@ class OptechaDesign(models.Model):
 
 class OptechaDrawing(models.Model):
     _name = 'optecha.drawing'
-    name = fields.Char('Drawing Name', required=True)
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'utm.mixin', 'format.address.mixin']
+
+    name = fields.Char('Drawing', required=True)
     opportunity_id = fields.Many2one('crm.lead', string='Opportunity', track_visibility='onchange', index=True,
                                      help="Opportunity", required=True)
     quotation_id = fields.Many2one('sale.order', string='Quotation', track_visibility='onchange', index=True,
@@ -462,6 +465,7 @@ class CrmLead(models.Model):
     design_id = fields.One2many('optecha.design', "opportunity_id", 'Design', readonly=False)
     drawing_id = fields.One2many('optecha.drawing', "opportunity_id", "Drawing", readonly=False)
     quotation_id = fields.One2many('sale.order', "opportunity_id", "Quotation", readonly=True)
+    rma_id = fields.One2many('optecha.rma', "opportunity_id", "RMA", readonly=False)
     select_design = fields.Many2one('optecha.design', string='Select Design', track_visibility='onchange', index=True,
                                     help="Design")
     project_name = fields.Char('Project Name')
