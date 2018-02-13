@@ -132,7 +132,7 @@
             </field>
         </record>
 
-        <record model="ir.ui.view" id="optecha_design_form">
+        <record model="ir.ui.view" id="optecha_design_form" >
             <field name="name">Statusbar</field>
             <field name="model">optecha.design</field>
             <field name="type">form</field>
