@@ -16,7 +16,7 @@
 
                     <thead>
                         <tr>
-                            <th style="text-align:right; padding-right: 10px;">CONPANY:</th>
+                            <th style="text-align:right; padding-right: 10px;">COMPANY:</th>
                             <th style="text-align:left"><t t-esc="doc.partner_id.name"/></th>
                             <th></th>
                             <th></th>
@@ -62,10 +62,15 @@
 
                             <td style="font-weight:bold; text-align:right; padding-right: 10px;">DATE:</td>
                             <td>
-                                <span t-if="doc.confirmation_date">
-                                    <span t-field="doc.confirmation_date" t-field-options='{"widget": "date"}'/>
-                                    <!--<t t-esc="doc.confirmation_date.format('MM DD YYYY')"/>-->
-                                </span>
+
+                                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+
+
+                                <!--<span t-if="doc.confirmation_date">-->
+                                    <!--&lt;!&ndash;<span t-field="doc.confirmation_date" t-field-options='{"widget": "date"}'/>&ndash;&gt;-->
+
+                                    <!--&lt;!&ndash;<t t-esc="doc.confirmation_date.format('MM DD YYYY')"/>&ndash;&gt;-->
+                                <!--</span>-->
                             </td>
 
                         </tr>
@@ -233,10 +238,12 @@
 
                             <td style="font-weight:bold; text-align:right; padding-right: 10px;">DATE:</td>
                             <td>
-                                <span t-if="doc.confirmation_date">
-                                    <span t-field="doc.confirmation_date" t-field-options='{"widget": "date"}'/>
-                                    <!--<t t-esc="doc.confirmation_date.format('MM DD YYYY')"/>-->
-                                </span>
+
+                                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+                                <!--<span t-if="doc.confirmation_date">-->
+                                    <!--<span t-field="doc.confirmation_date" t-field-options='{"widget": "date"}'/>-->
+                                    <!--&lt;!&ndash;<t t-esc="doc.confirmation_date.format('MM DD YYYY')"/>&ndash;&gt;-->
+                                <!--</span>-->
                             </td>
 
                         </tr>
@@ -359,7 +366,7 @@
 
                     <thead>
                         <tr>
-                            <th style="text-align:right; padding-right: 10px;">CONPANY:</th>
+                            <th style="text-align:right; padding-right: 10px;">COMPANY:</th>
                             <th style="text-align:left"><t t-esc="doc.partner_id.name"/></th>
                             <th></th>
                             <th></th>
@@ -405,10 +412,11 @@
 
                             <td style="font-weight:bold; text-align:right; padding-right: 10px;">DATE:</td>
                             <td>
-                                <span t-if="doc.confirmation_date">
-                                    <span t-field="doc.confirmation_date" t-field-options='{"widget": "date"}'/>
-                                    <!--<t t-esc="doc.confirmation_date.format('MM DD YYYY')"/>-->
-                                </span>
+                                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+                                <!--<span t-if="doc.confirmation_date">-->
+                                    <!--<span t-field="doc.confirmation_date" t-field-options='{"widget": "date"}'/>-->
+                                    <!--&lt;!&ndash;<t t-esc="doc.confirmation_date.format('MM DD YYYY')"/>&ndash;&gt;-->
+                                <!--</span>-->
                             </td>
 
                         </tr>

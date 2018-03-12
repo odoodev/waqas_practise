@@ -9,7 +9,7 @@ class OptechaDesign(models.Model):
     _name = 'optecha.design'
     _inherit = ['mail.thread', 'mail.activity.mixin', 'utm.mixin', 'format.address.mixin']
 
-    name = fields.Char('Design', required=False)
+    name = fields.Char('Design', required=True)
     project_name = fields.Char('Project Name', required=False)
     project_location = fields.Char('Project Location', required=False)
     project_completion_date = fields.Date('Expected Completion Date')
@@ -39,6 +39,7 @@ class OptechaDesign(models.Model):
         ('out_to_date', 'Out of Date')
         ], default='in_progress')
     comment = fields.Text(string="Review Comments")
+    customer_comment = fields.Text(string="Customer Review Comments")
 
     @api.depends("state_date")
     def _compute_no_of_days(self):
@@ -47,6 +48,16 @@ class OptechaDesign(models.Model):
             state_date_time = fields.Datetime.from_string(design.state_date)
             current_date_time = fields.Datetime.from_string(fields.Datetime.now())
             design.no_of_days = abs(current_date_time - state_date_time).days
+
+    def name_get(self):
+        result = []
+        for design in self:
+            if design.revision_version:
+                temp = design.name + " R-" + design.revision_version if design.revision_version else ""
+                result.append((design.id, temp))
+            else:
+                result.append((design.id, design.name))
+        return result
 
     @api.model
     def create(self, values):
@@ -148,20 +159,28 @@ class OptechaDesign(models.Model):
 
     @api.multi
     def reset_by_customer(self):
-        template = self.env["mail.template"].search([("name", "=", "Design Rejected By Customer")])
-        local_context = self.env.context.copy()
-        local_context.update({"revision_no": self.revision_version,
-                              "customer_name": self.env.user.name,
-                              "opportunity_name": self.opportunity_id.name,
-                              "share_url": self.get_share_url()})
-        # lead_designer_id = self.env['res.groups'].search([('name', '=', 'Designer')]).id
-        users = self.env["res.users"].search([("email", "=", self.designer_id[0].email)])
-        for user in users:
-            template.with_context(local_context).send_mail(user.id, force_send=True)
-        self.write({
-            'state': 'in_progress',
-        })
-        self.state_date = fields.Datetime.now()
+        if self.customer_comment:
+            template = self.env["mail.template"].search([("name", "=", "Design Rejected By Customer")])
+            temp = template["body_html"]
+            temporary = template["body_html"].split("adha_kr_dy")
+            # as format and other specifier % for string were not working.
+            template["body_html"] = temporary[0] + self.customer_comment + temporary[1]
+            local_context = self.env.context.copy()
+            local_context.update({"revision_no": self.revision_version,
+                                  "customer_name": self.env.user.name,
+                                  "opportunity_name": self.opportunity_id.name,
+                                  "share_url": self.get_share_url()})
+            users = self.env["res.users"].search([("email", "=", self.designer_id[0].email)])
+            for user in users:
+                template.with_context(local_context).send_mail(user.id, force_send=True)
+            template["body_html"] = temp
+            self.write({
+                'state': 'out_to_date',
+            })
+            self.state_date = fields.Datetime.now()
+            self.customer_comment = False
+        else:
+            raise osv.except_osv(('Error'), ('Kindly mention reasons of rejection in Review Comments box'))
 
     @api.multi
     def action_quotation_send(self):
@@ -249,8 +268,8 @@ class OptechaDrawing(models.Model):
     project_name = fields.Char('Project Name')
     revision_version = fields.Char('Design Revision Version')
     version = fields.Char('Drawing Version')
-    contractor_id = fields.Many2one('res.users')
-    assign_to = fields.Many2one('res.users')
+    contractor_id = fields.Many2one('res.users', required=True)
+    assign_to = fields.Many2one('res.users', required=True)
     comment = fields.Text(string="Review Comments")
     state_date = fields.Datetime(default=fields.Datetime.now, store=True)
     no_of_days = fields.Float(compute='_compute_no_of_days', string='Number of Days', store=True)
@@ -462,9 +481,9 @@ class CrmLead(models.Model):
 
     quotation_fees_id = fields.One2many('sale.order', "opportunity_id", "Design Fees", readonly=True)
     po_order = fields.One2many('purchase.order', "opportunity_id", "Purchase Orders", readonly=True)
-    design_id = fields.One2many('optecha.design', "opportunity_id", 'Design', readonly=False)
-    drawing_id = fields.One2many('optecha.drawing', "opportunity_id", "Drawing", readonly=False)
-    quotation_id = fields.One2many('sale.order', "opportunity_id", "Quotation", readonly=True)
+    design_id = fields.One2many('optecha.design', "opportunity_id", ' ', readonly=False)
+    drawing_id = fields.One2many('optecha.drawing', "opportunity_id", " ", readonly=False)
+    quotation_id = fields.One2many('sale.order', "opportunity_id", " ", readonly=True)
     rma_id = fields.One2many('optecha.rma', "opportunity_id", "RMA", readonly=False)
     select_design = fields.Many2one('optecha.design', string='Select Design', track_visibility='onchange', index=True,
                                     help="Design")
@@ -489,7 +508,7 @@ class CrmLead(models.Model):
             local_context = self.env.context.copy()
             local_context.update({"opportunity_name": self.name,
                                   "share_url": self.get_share_url(opportunity_id)})
-            lead_designer_id = self.env['res.groups'].search([('name','=', 'Lead Designer')]).id
+            lead_designer_id = self.env['res.groups'].search([('name', '=', 'Lead Designer')]).id
             users = self.env["res.users"].search([("groups_id", "=", lead_designer_id)])
             for user in users:
                 template.with_context(local_context).send_mail(user.id)
@@ -579,4 +598,4 @@ class OptechaPurchaseOrderLine(models.Model):
 
     opportunity_id = fields.Many2one('crm.lead', string='Opportunity', track_visibility='onchange', index=True,
                                      help="Opportunity")
-    dis_id = fields.Many2many('res.partner.category',"Distributor", related="partner_id.category_id")
+    dis_id = fields.Many2many('res.partner.category', "Distributor", related="partner_id.category_id")

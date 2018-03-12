@@ -136,7 +136,7 @@
                             domain="[('state', '=', 'engineer_review')]"
                             help="Contractor/Engineer Review Approval Drawing Package"/>
                     <separator/>
-                    <filter string="Design Done" name="done"
+                    <filter string="Drawing Done" name="done"
                             domain="[('state', '=', 'done')]"
                             help="Done"/>
                 </search>
